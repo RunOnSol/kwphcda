@@ -1,7 +1,15 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import { supabase, getUserProfile } from '../lib/supabase';
-import { User, AuthState } from '../types';
-import toast from 'react-hot-toast';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from "react";
+
+import toast from "react-hot-toast";
+
+import { getUserProfile, supabase } from "../lib/supabase";
+import { AuthState } from "../types";
 
 interface AuthContextType extends AuthState {
   signUp: (email: string, password: string, userData: any) => Promise<void>;
@@ -15,7 +23,7 @@ const AuthContext = createContext<AuthContextType | undefined>(undefined);
 export const useAuth = () => {
   const context = useContext(AuthContext);
   if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
+    throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
 };
@@ -33,24 +41,31 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
-      const { data: { user: authUser } } = await supabase.auth.getUser();
-      
+      const {
+        data: { user: authUser },
+      } = await supabase.auth.getUser();
+
       if (authUser) {
         const { data: userProfile, error } = await getUserProfile(authUser.id);
-        
+
         if (error) {
-          console.error('Error fetching user profile:', error);
-          setState(prev => ({ ...prev, user: null, loading: false }));
+          console.error("Error fetching user profile:", error);
+          setState((prev) => ({ ...prev, user: null, loading: false }));
           return;
         }
-        
-        setState(prev => ({ ...prev, user: userProfile, loading: false }));
+
+        setState((prev) => ({ ...prev, user: userProfile, loading: false }));
       } else {
-        setState(prev => ({ ...prev, user: null, loading: false }));
+        setState((prev) => ({ ...prev, user: null, loading: false }));
       }
     } catch (error) {
-      console.error('Error refreshing user:', error);
-      setState(prev => ({ ...prev, user: null, loading: false, error: 'Failed to refresh user' }));
+      console.error("Error refreshing user:", error);
+      setState((prev) => ({
+        ...prev,
+        user: null,
+        loading: false,
+        error: "Failed to refresh user",
+      }));
     }
   };
 
@@ -59,61 +74,97 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     refreshUser();
 
     // Listen for auth changes
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
-        if (event === 'SIGNED_IN' && session?.user) {
-          await refreshUser();
-        } else if (event === 'SIGNED_OUT') {
-          setState(prev => ({ ...prev, user: null, loading: false }));
-        }
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
+      if (event === "SIGNED_IN" && session?.user) {
+        await refreshUser();
+      } else if (event === "SIGNED_OUT") {
+        setState((prev) => ({ ...prev, user: null, loading: false }));
       }
-    );
+    });
 
     return () => subscription.unsubscribe();
   }, []);
 
   const signUp = async (email: string, password: string, userData: any) => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+
+      // First, try to sign up with metadata to work with the existing trigger
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
-          data: userData,
+          data: {
+            full_name: userData.full_name || "",
+            username: userData.username || "",
+            gender: userData.gender || "male",
+            lga: userData.lga || "",
+            ward: userData.ward || "",
+            phc_id: userData.phc_id || "",
+          },
         },
       });
 
       if (error) throw error;
 
       if (data.user) {
-        // Create user profile in database
-        const { error: profileError } = await supabase
-          .from('users')
-          .insert({
-            id: data.user.id,
-            email: data.user.email,
-            ...userData,
-            status: 'pending',
-          });
-
-        if (profileError) throw profileError;
-        
-        toast.success('Account created successfully! Please wait for approval.');
+        toast.success(
+          "Account created successfully! Please wait for approval."
+        );
       }
     } catch (error: any) {
-      setState(prev => ({ ...prev, error: error.message, loading: false }));
+      // If the error is related to the trigger, try to handle it gracefully
+      if (
+        error.message.includes("500") ||
+        error.message.includes("Internal Server Error")
+      ) {
+        // The user might have been created in auth but not in our users table
+        // Let's try to create the profile manually
+        try {
+          const {
+            data: { user },
+          } = await supabase.auth.getUser();
+          if (user) {
+            const { error: profileError } = await supabase
+              .from("users")
+              .upsert({
+                id: user.id,
+                email: user.email || email,
+                full_name: userData.full_name,
+                username: userData.username,
+                gender: userData.gender,
+                lga: userData.lga,
+                ward: userData.ward,
+                phc_id: userData.phc_id || null,
+                status: "pending",
+              });
+
+            if (!profileError) {
+              toast.success(
+                "Account created successfully! Please wait for approval."
+              );
+              return;
+            }
+          }
+        } catch (fallbackError) {
+          console.error("Fallback profile creation failed:", fallbackError);
+        }
+      }
+
+      setState((prev) => ({ ...prev, error: error.message, loading: false }));
       toast.error(error.message);
       throw error;
     } finally {
-      setState(prev => ({ ...prev, loading: false }));
+      setState((prev) => ({ ...prev, loading: false }));
     }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
-      setState(prev => ({ ...prev, loading: true, error: null }));
-      
+      setState((prev) => ({ ...prev, loading: true, error: null }));
+
       const { data, error } = await supabase.auth.signInWithPassword({
         email,
         password,
@@ -123,10 +174,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (data.user) {
         await refreshUser();
-        toast.success('Signed in successfully!');
+        toast.success("Signed in successfully!");
       }
     } catch (error: any) {
-      setState(prev => ({ ...prev, error: error.message, loading: false }));
+      setState((prev) => ({ ...prev, error: error.message, loading: false }));
       toast.error(error.message);
       throw error;
     }
@@ -134,15 +185,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const signOut = async () => {
     try {
-      setState(prev => ({ ...prev, loading: true }));
-      
+      setState((prev) => ({ ...prev, loading: true }));
+
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
-      
-      setState(prev => ({ ...prev, user: null, loading: false }));
-      toast.success('Signed out successfully!');
+
+      setState((prev) => ({ ...prev, user: null, loading: false }));
+      toast.success("Signed out successfully!");
     } catch (error: any) {
-      setState(prev => ({ ...prev, error: error.message, loading: false }));
+      setState((prev) => ({ ...prev, error: error.message, loading: false }));
       toast.error(error.message);
     }
   };
