@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 
 import { Menu, X } from "lucide-react";
+import { useNavigate } from 'react-router-dom';
 
 import { useModal } from "../context/ModalContext";
 import Logo from "./Logo";
@@ -19,6 +20,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { openModal } = useModal();
+  const navigate = useNavigate();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -45,6 +47,10 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
+  const handleAuthClick = () => {
+    navigate('/auth');
+  };
+
   return (
     <header
       className={`fixed w-full z-50 transition-all duration-300 ${
@@ -66,6 +72,14 @@ const Navbar = () => {
             </button>
           ))}
         </nav>
+
+        {/* Auth Button - Desktop */}
+        <button
+          onClick={handleAuthClick}
+          className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+        >
+          Login / Register
+        </button>
 
         {/* Mobile Menu Button */}
         <button
@@ -90,6 +104,14 @@ const Navbar = () => {
                 {item.label}
               </button>
             ))}
+            
+            {/* Auth Button - Mobile */}
+            <button
+              onClick={handleAuthClick}
+              className="w-full text-left py-2 px-4 text-white bg-green-600 hover:bg-green-700 font-medium rounded-md transition-colors"
+            >
+              Login / Register
+            </button>
           </div>
         </div>
       )}
