@@ -1,4 +1,4 @@
-import React from "react";
+import React from 'react';
 
 const ExecutiveSection = () => {
   return (
@@ -12,7 +12,7 @@ const ExecutiveSection = () => {
           <div className="w-full md:w-1/3">
             <div className="rounded-lg overflow-hidden shadow-lg transform transition-transform hover:scale-105 duration-300">
               <img
-                src="http://kwphcda.lazerwebs.com/image/ess.jpg"
+                src="http://kwphcda.com.ng/image/ess.jpg"
                 alt="Executive Secretary"
                 className="w-full aspect-square object-cover"
               />
@@ -21,14 +21,14 @@ const ExecutiveSection = () => {
 
           <div className="w-full md:w-2/3">
             <h3 className="text-2xl font-semibold text-green-700 mb-2">
-              Dr. Nusirat Elelu
+              Prof. Nusirat Elelu
             </h3>
             <p className="text-sm text-green-600 mb-4">
               Executive Secretary, KWPHCDA
             </p>
             <div className="prose text-gray-700">
               <p className="mb-4">
-                Dr. Nusirat Elelu is a distinguished scholar, a Doctor of
+                Prof. Nusirat Elelu is a distinguished scholar, a Doctor of
                 Veterinary Medicine from the University of Maiduguri, who
                 furthered her academic pursuit by earning a PhD from the
                 prestigious University of Bristol (UK). Specializing as a field

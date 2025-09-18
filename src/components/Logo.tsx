@@ -1,11 +1,10 @@
-import React from "react";
-import { Activity } from "lucide-react";
+import React from 'react';
 
 const Logo = () => {
   return (
     <div className="flex items-center">
       <img
-        src="http://kwphcda.lazerwebs.com/image/logo.jpeg"
+        src="http://kwphcda.com.ng/image/logo.jpeg"
         alt="KWPHCDA Logo"
         className="h-12 w-12 rounded-full mr-2"
       />

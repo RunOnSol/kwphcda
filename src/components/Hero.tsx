@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useEffect, useState } from "react";
 
 // Slide data
 const slides = [
@@ -7,21 +7,21 @@ const slides = [
     title: "Immunization Saves Lives",
     description:
       "Protecting our children through comprehensive vaccination programs across Kwara State.",
-    imageUrl: "http://kwphcda.lazerwebs.com/image/2.jpg",
+    imageUrl: "http://kwphcda.com.ng/image/2.jpg",
   },
   {
     id: 2,
     title: "Vaccine Awareness",
     description:
       "Educating communities about the importance of vaccines in preventing diseases.",
-    imageUrl: "http://kwphcda.lazerwebs.com/image/1.jpg",
+    imageUrl: "http://kwphcda.com.ng/image/1.jpg",
   },
   {
     id: 3,
     title: "Maternal Health Services",
     description:
       "Ensuring the health and wellbeing of mothers across all communities in Kwara State.",
-    imageUrl: "http://kwphcda.lazerwebs.com/image/post1.jpg",
+    imageUrl: "http://kwphcda.com.ng/image/post1.jpg",
   },
   {
     id: 4,
