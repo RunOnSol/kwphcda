@@ -94,18 +94,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      // First, try to sign up with metadata to work with the existing trigger
+      // Sign up with proper metadata structure for the trigger
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: userData.full_name || "",
-            username: userData.username || "",
-            gender: userData.gender || "male",
-            lga: userData.lga || "",
-            ward: userData.ward || "",
-            phc_id: userData.phc_id || "",
+            full_name: userData.full_name,
+            username: userData.username,
+            gender: userData.gender,
+            lga: userData.lga,
+            ward: userData.ward,
+            phc_id: userData.phc_id || null,
           },
         },
       });
@@ -118,44 +118,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         );
       }
     } catch (error: any) {
-      // If the error is related to the trigger, try to handle it gracefully
-      if (
-        error.message.includes("500") ||
-        error.message.includes("Internal Server Error")
-      ) {
-        // The user might have been created in auth but not in our users table
-        // Let's try to create the profile manually
-        try {
-          const {
-            data: { user },
-          } = await supabase.auth.getUser();
-          if (user) {
-            const { error: profileError } = await supabase
-              .from("users")
-              .upsert({
-                id: user.id,
-                email: user.email || email,
-                full_name: userData.full_name,
-                username: userData.username,
-                gender: userData.gender,
-                lga: userData.lga,
-                ward: userData.ward,
-                phc_id: userData.phc_id || null,
-                status: "pending",
-              });
-
-            if (!profileError) {
-              toast.success(
-                "Account created successfully! Please wait for approval."
-              );
-              return;
-            }
-          }
-        } catch (fallbackError) {
-          console.error("Fallback profile creation failed:", fallbackError);
-        }
-      }
-
       setState((prev) => ({ ...prev, error: error.message, loading: false }));
       toast.error(error.message);
       throw error;
