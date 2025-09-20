@@ -94,18 +94,18 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     try {
       setState((prev) => ({ ...prev, loading: true, error: null }));
 
-      // Sign up with proper metadata structure for the trigger
+      // Sign up with user metadata for the trigger - ensure all fields are strings
       const { data, error } = await supabase.auth.signUp({
         email,
         password,
         options: {
           data: {
-            full_name: userData.full_name,
-            username: userData.username,
-            gender: userData.gender,
-            lga: userData.lga,
-            ward: userData.ward,
-            phc_id: userData.phc_id || null,
+            full_name: userData.full_name || "",
+            username: userData.username || "",
+            gender: userData.gender || "male",
+            lga: userData.lga || "",
+            ward: userData.ward || "",
+            phc_id: userData.phc_id || "",
           },
         },
       });
@@ -113,13 +113,28 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
 
       if (data.user) {
+        // Wait a moment for the trigger to complete and try to refresh
+        await new Promise((resolve) => setTimeout(resolve, 2000));
+
+        // Try to refresh user profile, but don't fail if it's not ready yet
+        try {
+          await refreshUser();
+        } catch (refreshError) {
+          console.log(
+            "Profile creation in progress, will be available after approval"
+          );
+        }
+
         toast.success(
-          "Account created successfully! Please wait for approval."
+          "Account created successfully! Please wait for admin approval to access the system."
         );
       }
     } catch (error: any) {
+      console.error("Signup error:", error);
       setState((prev) => ({ ...prev, error: error.message, loading: false }));
-      toast.error(error.message);
+      toast.error(
+        error.message || "Failed to create account. Please try again."
+      );
       throw error;
     } finally {
       setState((prev) => ({ ...prev, loading: false }));
