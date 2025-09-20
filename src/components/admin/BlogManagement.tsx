@@ -1,26 +1,46 @@
-import React, { useEffect, useState } from 'react';
-import { getAllBlogPosts, createBlogPost, updateBlogPost, deleteBlogPost } from '../../lib/supabase';
-import { BlogPost, BLOG_CATEGORIES } from '../../types';
-import { useAuth } from '../../context/AuthContext';
-import { Plus, Edit, Trash2, Search, Eye, Calendar } from 'lucide-react';
+import React, {
+  useEffect,
+  useState,
+} from 'react';
+
 import { format } from 'date-fns';
+import {
+  Calendar,
+  Edit,
+  FileText,
+  Plus,
+  Search,
+  Trash2,
+} from 'lucide-react';
 import toast from 'react-hot-toast';
+
+import { useAuth } from '../../context/AuthContext';
+import {
+  createBlogPost,
+  deleteBlogPost,
+  getAllBlogPosts,
+  updateBlogPost,
+} from '../../lib/supabase';
+import {
+  BLOG_CATEGORIES,
+  BlogPost,
+} from '../../types';
 
 const BlogManagement: React.FC = () => {
   const { user } = useAuth();
   const [posts, setPosts] = useState<BlogPost[]>([]);
   const [loading, setLoading] = useState(true);
-  const [searchTerm, setSearchTerm] = useState('');
-  const [statusFilter, setStatusFilter] = useState('all');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [statusFilter, setStatusFilter] = useState("all");
   const [showModal, setShowModal] = useState(false);
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
   const [formData, setFormData] = useState({
-    title: '',
-    excerpt: '',
-    content: '',
-    category: '',
-    image_url: '',
-    status: 'draft' as 'draft' | 'published' | 'archived',
+    title: "",
+    excerpt: "",
+    content: "",
+    category: "",
+    image_url: "",
+    status: "draft" as "draft" | "published" | "archived",
   });
 
   useEffect(() => {
@@ -33,8 +53,8 @@ const BlogManagement: React.FC = () => {
       if (error) throw error;
       setPosts(data || []);
     } catch (error) {
-      console.error('Error fetching posts:', error);
-      toast.error('Failed to fetch blog posts');
+      console.error("Error fetching posts:", error);
+      toast.error("Failed to fetch blog posts");
     } finally {
       setLoading(false);
     }
@@ -42,7 +62,7 @@ const BlogManagement: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
       const postData = {
         ...formData,
@@ -52,23 +72,33 @@ const BlogManagement: React.FC = () => {
       if (editingPost) {
         const { error } = await updateBlogPost(editingPost.id, postData);
         if (error) throw error;
-        
-        setPosts(posts.map(post => 
-          post.id === editingPost.id ? { ...post, ...postData } : post
-        ));
-        toast.success('Post updated successfully');
+
+        setPosts(
+          posts.map((post) =>
+            post.id === editingPost.id
+              ? { ...post, ...postData, author_id: user?.id ?? post.author_id }
+              : post
+          )
+        );
+        toast.success("Post updated successfully");
       } else {
         const { data, error } = await createBlogPost(postData);
         if (error) throw error;
-        
-        setPosts([{ ...data, author: { full_name: user?.full_name, username: user?.username } }, ...posts]);
-        toast.success('Post created successfully');
+
+        setPosts([
+          {
+            ...data,
+            author: { full_name: user?.full_name, username: user?.username },
+          },
+          ...posts,
+        ]);
+        toast.success("Post created successfully");
       }
-      
+
       resetForm();
     } catch (error) {
-      console.error('Error saving post:', error);
-      toast.error('Failed to save post');
+      console.error("Error saving post:", error);
+      toast.error("Failed to save post");
     }
   };
 
@@ -79,46 +109,48 @@ const BlogManagement: React.FC = () => {
       excerpt: post.excerpt,
       content: post.content,
       category: post.category,
-      image_url: post.image_url || '',
+      image_url: post.image_url || "",
       status: post.status,
     });
     setShowModal(true);
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm('Are you sure you want to delete this post?')) return;
-    
+    if (!confirm("Are you sure you want to delete this post?")) return;
+
     try {
       const { error } = await deleteBlogPost(id);
       if (error) throw error;
-      
-      setPosts(posts.filter(post => post.id !== id));
-      toast.success('Post deleted successfully');
+
+      setPosts(posts.filter((post) => post.id !== id));
+      toast.success("Post deleted successfully");
     } catch (error) {
-      console.error('Error deleting post:', error);
-      toast.error('Failed to delete post');
+      console.error("Error deleting post:", error);
+      toast.error("Failed to delete post");
     }
   };
 
   const resetForm = () => {
     setFormData({
-      title: '',
-      excerpt: '',
-      content: '',
-      category: '',
-      image_url: '',
-      status: 'draft',
+      title: "",
+      excerpt: "",
+      content: "",
+      category: "",
+      image_url: "",
+      status: "draft",
     });
     setEditingPost(null);
     setShowModal(false);
   };
 
-  const filteredPosts = posts.filter(post => {
-    const matchesSearch = post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         post.category.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesStatus = statusFilter === 'all' || post.status === statusFilter;
-    
+  const filteredPosts = posts.filter((post) => {
+    const matchesSearch =
+      post.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.excerpt.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      post.category.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesStatus =
+      statusFilter === "all" || post.status === statusFilter;
+
     return matchesSearch && matchesStatus;
   });
 
@@ -145,7 +177,7 @@ const BlogManagement: React.FC = () => {
               className="pl-10 w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
             />
           </div>
-          
+
           <select
             value={statusFilter}
             onChange={(e) => setStatusFilter(e.target.value)}
@@ -157,7 +189,7 @@ const BlogManagement: React.FC = () => {
             <option value="archived">Archived</option>
           </select>
         </div>
-        
+
         <button
           onClick={() => setShowModal(true)}
           className="inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
@@ -170,49 +202,54 @@ const BlogManagement: React.FC = () => {
       {/* Posts Grid */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {filteredPosts.map((post) => (
-          <div key={post.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+          <div
+            key={post.id}
+            className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden"
+          >
             {post.image_url && (
               <div className="h-48 overflow-hidden">
-                <img 
-                  src={post.image_url} 
+                <img
+                  src={post.image_url}
                   alt={post.title}
                   className="w-full h-full object-cover"
                 />
               </div>
             )}
-            
+
             <div className="p-6">
               <div className="flex items-center justify-between mb-3">
-                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                  post.status === 'published' ? 'bg-green-100 text-green-800' :
-                  post.status === 'draft' ? 'bg-yellow-100 text-yellow-800' :
-                  'bg-gray-100 text-gray-800'
-                }`}>
+                <span
+                  className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                    post.status === "published"
+                      ? "bg-green-100 text-green-800"
+                      : post.status === "draft"
+                      ? "bg-yellow-100 text-yellow-800"
+                      : "bg-gray-100 text-gray-800"
+                  }`}
+                >
                   {post.status}
                 </span>
                 <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-blue-100 text-blue-800">
                   {post.category}
                 </span>
               </div>
-              
+
               <h3 className="text-lg font-semibold text-gray-900 mb-2 line-clamp-2">
                 {post.title}
               </h3>
-              
+
               <p className="text-gray-600 text-sm mb-4 line-clamp-3">
                 {post.excerpt}
               </p>
-              
+
               <div className="flex items-center justify-between text-sm text-gray-500 mb-4">
                 <div className="flex items-center">
                   <Calendar className="h-4 w-4 mr-1" />
-                  {format(new Date(post.created_at), 'MMM dd, yyyy')}
+                  {format(new Date(post.created_at), "MMM dd, yyyy")}
                 </div>
-                <div>
-                  By {post.author?.full_name || 'Unknown'}
-                </div>
+                <div>By {post.author?.full_name || "Unknown"}</div>
               </div>
-              
+
               <div className="flex space-x-2">
                 <button
                   onClick={() => handleEdit(post)}
@@ -237,9 +274,13 @@ const BlogManagement: React.FC = () => {
       {filteredPosts.length === 0 && (
         <div className="text-center py-12">
           <FileText className="mx-auto h-12 w-12 text-gray-400" />
-          <h3 className="mt-2 text-sm font-medium text-gray-900">No posts found</h3>
+          <h3 className="mt-2 text-sm font-medium text-gray-900">
+            No posts found
+          </h3>
           <p className="mt-1 text-sm text-gray-500">
-            {searchTerm ? 'Try adjusting your search criteria.' : 'Get started by creating a new blog post.'}
+            {searchTerm
+              ? "Try adjusting your search criteria."
+              : "Get started by creating a new blog post."}
           </p>
         </div>
       )}
@@ -250,10 +291,10 @@ const BlogManagement: React.FC = () => {
           <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-y-auto">
             <div className="p-6 border-b border-gray-200">
               <h3 className="text-lg font-medium text-gray-900">
-                {editingPost ? 'Edit Post' : 'Create New Post'}
+                {editingPost ? "Edit Post" : "Create New Post"}
               </h3>
             </div>
-            
+
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -263,11 +304,13 @@ const BlogManagement: React.FC = () => {
                   type="text"
                   required
                   value={formData.title}
-                  onChange={(e) => setFormData(prev => ({ ...prev, title: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, title: e.target.value }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                 />
               </div>
-              
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -276,23 +319,35 @@ const BlogManagement: React.FC = () => {
                   <select
                     required
                     value={formData.category}
-                    onChange={(e) => setFormData(prev => ({ ...prev, category: e.target.value }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        category: e.target.value,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                   >
                     <option value="">Select Category</option>
                     {BLOG_CATEGORIES.map((category) => (
-                      <option key={category} value={category}>{category}</option>
+                      <option key={category} value={category}>
+                        {category}
+                      </option>
                     ))}
                   </select>
                 </div>
-                
+
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Status
                   </label>
                   <select
                     value={formData.status}
-                    onChange={(e) => setFormData(prev => ({ ...prev, status: e.target.value as any }))}
+                    onChange={(e) =>
+                      setFormData((prev) => ({
+                        ...prev,
+                        status: e.target.value as any,
+                      }))
+                    }
                     className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                   >
                     <option value="draft">Draft</option>
@@ -301,7 +356,7 @@ const BlogManagement: React.FC = () => {
                   </select>
                 </div>
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Image URL (Optional)
@@ -309,12 +364,17 @@ const BlogManagement: React.FC = () => {
                 <input
                   type="url"
                   value={formData.image_url}
-                  onChange={(e) => setFormData(prev => ({ ...prev, image_url: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      image_url: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                   placeholder="https://example.com/image.jpg"
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Excerpt
@@ -323,12 +383,17 @@ const BlogManagement: React.FC = () => {
                   required
                   rows={3}
                   value={formData.excerpt}
-                  onChange={(e) => setFormData(prev => ({ ...prev, excerpt: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      excerpt: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                   placeholder="Brief description of the post..."
                 />
               </div>
-              
+
               <div>
                 <label className="block text-sm font-medium text-gray-700 mb-1">
                   Content
@@ -337,12 +402,17 @@ const BlogManagement: React.FC = () => {
                   required
                   rows={12}
                   value={formData.content}
-                  onChange={(e) => setFormData(prev => ({ ...prev, content: e.target.value }))}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      content: e.target.value,
+                    }))
+                  }
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                   placeholder="Write your post content here..."
                 />
               </div>
-              
+
               <div className="flex justify-end space-x-3 pt-4">
                 <button
                   type="button"
@@ -355,7 +425,7 @@ const BlogManagement: React.FC = () => {
                   type="submit"
                   className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
                 >
-                  {editingPost ? 'Update Post' : 'Create Post'}
+                  {editingPost ? "Update Post" : "Create Post"}
                 </button>
               </div>
             </form>
