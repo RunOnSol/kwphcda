@@ -1,17 +1,19 @@
 import React, { useState } from 'react';
-import { useAuth } from '../../context/AuthContext';
-import { 
-  Users, 
-  Building2, 
-  FileText, 
-  Settings, 
-  LogOut, 
-  Menu, 
-  X,
+
+import {
+  BarChart3,
+  Building2,
+  FileText,
   Home,
+  LogOut,
+  Menu,
+  Settings,
   Shield,
-  BarChart3
+  Users,
+  X,
 } from 'lucide-react';
+
+import { useAuth } from '../../context/AuthContext';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -19,22 +21,43 @@ interface AdminLayoutProps {
   onTabChange: (tab: string) => void;
 }
 
-const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, onTabChange }) => {
+const AdminLayout: React.FC<AdminLayoutProps> = ({
+  children,
+  activeTab,
+  onTabChange,
+}) => {
   const { user, signOut } = useAuth();
   const [sidebarOpen, setSidebarOpen] = useState(false);
 
-  const canAccessUsers = user?.role === 'super_admin' || user?.role === 'admin';
-  const canAccessPHCs = user?.role === 'super_admin' || user?.role === 'admin';
-  const canAccessBlog = ['super_admin', 'admin', 'manager', 'blogger'].includes(user?.role || '');
+  const canAccessUsers = user?.role === "super_admin" || user?.role === "admin";
+  const canAccessPHCs = user?.role === "super_admin" || user?.role === "admin";
+  const canAccessBlog = ["super_admin", "admin", "manager", "blogger"].includes(
+    user?.role || ""
+  );
 
   const menuItems = [
-    { id: 'dashboard', label: 'Dashboard', icon: Home, show: true },
-    { id: 'users', label: 'User Management', icon: Users, show: canAccessUsers },
-    { id: 'phcs', label: 'PHC Management', icon: Building2, show: canAccessPHCs },
-    { id: 'blog', label: 'Blog Management', icon: FileText, show: canAccessBlog },
-    { id: 'analytics', label: 'Analytics', icon: BarChart3, show: true },
-    { id: 'settings', label: 'Settings', icon: Settings, show: true },
-  ].filter(item => item.show);
+    { id: "dashboard", label: "Dashboard", icon: Home, show: true },
+    {
+      id: "users",
+      label: "User Management",
+      icon: Users,
+      show: canAccessUsers,
+    },
+    {
+      id: "phcs",
+      label: "PHC Management",
+      icon: Building2,
+      show: canAccessPHCs,
+    },
+    {
+      id: "blog",
+      label: "Blog Management",
+      icon: FileText,
+      show: canAccessBlog,
+    },
+    { id: "analytics", label: "Analytics", icon: BarChart3, show: true },
+    { id: "settings", label: "Settings", icon: Settings, show: true },
+  ].filter((item) => item.show);
 
   const handleSignOut = async () => {
     await signOut();
@@ -44,21 +67,25 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, onTabCha
     <div className="min-h-screen bg-gray-50 flex">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div 
+        <div
           className="fixed inset-0 z-40 bg-black bg-opacity-50 lg:hidden"
           onClick={() => setSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`
+      <div
+        className={`
         fixed inset-y-0 left-0 z-50 w-64 bg-white shadow-lg transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-0
-        ${sidebarOpen ? 'translate-x-0' : '-translate-x-full'}
-      `}>
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+      `}
+      >
         <div className="flex items-center justify-between h-16 px-6 border-b border-gray-200">
           <div className="flex items-center">
             <Shield className="h-8 w-8 text-green-600" />
-            <span className="ml-2 text-xl font-bold text-gray-900">KWPHCDA Admin</span>
+            <span className="ml-2 text-xl font-bold text-gray-900">
+              KWPHCDA
+            </span>
           </div>
           <button
             onClick={() => setSidebarOpen(false)}
@@ -81,9 +108,10 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, onTabCha
                   }}
                   className={`
                     w-full flex items-center px-4 py-3 text-left rounded-lg transition-colors duration-200
-                    ${activeTab === item.id 
-                      ? 'bg-green-100 text-green-700 border-r-4 border-green-600' 
-                      : 'text-gray-600 hover:bg-gray-100 hover:text-gray-900'
+                    ${
+                      activeTab === item.id
+                        ? "bg-green-100 text-green-700 border-r-4 border-green-600"
+                        : "text-gray-600 hover:bg-gray-100 hover:text-gray-900"
                     }
                   `}
                 >
@@ -102,8 +130,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, onTabCha
                 </span>
               </div>
               <div className="ml-3">
-                <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.full_name}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {user?.role?.replace("_", " ")}
+                </p>
               </div>
             </div>
             <button
@@ -128,30 +160,35 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, activeTab, onTabCha
             >
               <Menu className="h-6 w-6" />
             </button>
-            
+
             <div className="flex items-center space-x-4">
               <h1 className="text-2xl font-bold text-gray-900 capitalize">
-                {activeTab === 'dashboard' ? 'Dashboard' : 
-                 activeTab === 'users' ? 'User Management' :
-                 activeTab === 'phcs' ? 'PHC Management' :
-                 activeTab === 'blog' ? 'Blog Management' :
-                 activeTab === 'analytics' ? 'Analytics' :
-                 activeTab === 'settings' ? 'Settings' : activeTab}
+                {activeTab === "dashboard"
+                  ? "Dashboard"
+                  : activeTab === "users"
+                  ? "User Management"
+                  : activeTab === "phcs"
+                  ? "PHC Management"
+                  : activeTab === "blog"
+                  ? "Blog Management"
+                  : activeTab === "analytics"
+                  ? "Analytics"
+                  : activeTab === "settings"
+                  ? "Settings"
+                  : activeTab}
               </h1>
             </div>
 
             <div className="flex items-center space-x-4">
               <span className="text-sm text-gray-600">
-                Welcome, {user?.full_name}
+                Welcome, {user?.username}
               </span>
             </div>
           </div>
         </header>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto p-6">
-          {children}
-        </main>
+        <main className="flex-1 overflow-y-auto p-6">{children}</main>
       </div>
     </div>
   );
