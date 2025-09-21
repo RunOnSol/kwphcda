@@ -1,24 +1,18 @@
-import React from 'react';
+import React from "react";
 
-import { Toaster } from 'react-hot-toast';
-import {
-  BrowserRouter as Router,
-  Route,
-  Routes,
-} from 'react-router-dom';
+import { Toaster } from "react-hot-toast";
+import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
-import AdminPanel from './components/admin/AdminPanel';
-import AuthPage from './components/auth/AuthPage';
-import SigninPage from './components/auth/SigninPage';
-import SignupPage from './components/auth/SignupPage';
-import BlogPost from './components/blog/BlogPost';
-import LandingPage from './components/LandingPage';
-import LoadingSpinner from './components/LoadingSpinner';
-import ProtectedRoute from './components/ProtectedRoute';
-import {
-  AuthProvider,
-  useAuth,
-} from './context/AuthContext';
+import AdminPanel from "./components/admin/AdminPanel";
+import AuthPage from "./components/auth/AuthPage";
+import SigninPage from "./components/auth/SigninPage";
+import SignupPage from "./components/auth/SignupPage";
+import BlogPost from "./components/blog/BlogPost";
+import LandingPage from "./components/LandingPage";
+import LoadingSpinner from "./components/LoadingSpinner";
+import ProtectedRoute from "./components/ProtectedRoute";
+import { AuthProvider, useAuth } from "./context/AuthContext";
+import Dashboard from "./components/Dashboard";
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
@@ -38,7 +32,14 @@ const AppContent: React.FC = () => {
       <Route path="/blog/:id" element={<BlogPost />} />
 
       {/* Protected routes */}
-
+      <Route
+        path="/dash"
+        element={
+          <ProtectedRoute requireApproval>
+            <Dashboard />
+          </ProtectedRoute>
+        }
+      />
       <Route
         path="/dashboard"
         element={
