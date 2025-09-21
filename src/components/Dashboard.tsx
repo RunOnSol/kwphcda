@@ -1,16 +1,18 @@
 import React from 'react';
-import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
-import { 
-  Users, 
-  Building2, 
-  FileText, 
-  TrendingUp, 
-  Clock, 
-  CheckCircle,
+
+import {
+  Activity,
   ArrowRight,
-  Activity
+  Building2,
+  CheckCircle,
+  Clock,
+  FileText,
+  TrendingUp,
+  Users,
 } from 'lucide-react';
+import { useNavigate } from 'react-router-dom';
+
+import { useAuth } from '../context/AuthContext';
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
@@ -18,15 +20,22 @@ const Dashboard: React.FC = () => {
 
   const handleSignOut = async () => {
     await signOut();
-    navigate('/');
+    navigate("/");
   };
 
   const handleAdminAccess = () => {
-    navigate('/admin');
+    navigate("/dashboard");
   };
 
-  const canAccessAdmin = user?.status === 'approved' && 
-    ['super_admin', 'admin', 'manager', 'blogger', 'phc_administrator'].includes(user?.role || '');
+  const canAccessAdmin =
+    user?.status === "approved" &&
+    [
+      "super_admin",
+      "admin",
+      "manager",
+      "blogger",
+      "phc_administrator",
+    ].includes(user?.role || "");
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -37,23 +46,31 @@ const Dashboard: React.FC = () => {
             <div className="flex items-center">
               <Activity className="h-8 w-8 text-green-600 mr-3" />
               <div>
-                <h1 className="text-xl font-bold text-gray-900">KWPHCDA Dashboard</h1>
-                <p className="text-sm text-gray-500">Kwara State Primary Health Care Development Agency</p>
+                <h1 className="text-xl font-bold text-gray-900">
+                  KWPHCDA Dashboard
+                </h1>
+                <p className="text-sm text-gray-500">
+                  Kwara State Primary Health Care Development Agency
+                </p>
               </div>
             </div>
-            
+
             <div className="flex items-center space-x-4">
               <div className="text-right">
-                <p className="text-sm font-medium text-gray-900">{user?.full_name}</p>
-                <p className="text-xs text-gray-500 capitalize">{user?.role?.replace('_', ' ')}</p>
+                <p className="text-sm font-medium text-gray-900">
+                  {user?.full_name}
+                </p>
+                <p className="text-xs text-gray-500 capitalize">
+                  {user?.role?.replace("_", " ")}
+                </p>
               </div>
-              
+
               <div className="h-8 w-8 rounded-full bg-green-600 flex items-center justify-center">
                 <span className="text-white font-medium text-sm">
                   {user?.full_name?.charAt(0).toUpperCase()}
                 </span>
               </div>
-              
+
               <button
                 onClick={handleSignOut}
                 className="text-gray-500 hover:text-gray-700 text-sm font-medium"
@@ -67,7 +84,7 @@ const Dashboard: React.FC = () => {
 
       {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {user?.status === 'pending' ? (
+        {user?.status === "pending" ? (
           // Pending Approval State
           <div className="max-w-md mx-auto">
             <div className="bg-white rounded-lg shadow-md p-6 text-center">
@@ -76,17 +93,21 @@ const Dashboard: React.FC = () => {
                   <Clock className="h-8 w-8 text-yellow-600" />
                 </div>
               </div>
-              <h2 className="text-xl font-semibold text-gray-900 mb-2">Account Pending Approval</h2>
+              <h2 className="text-xl font-semibold text-gray-900 mb-2">
+                Account Pending Approval
+              </h2>
               <p className="text-gray-600 mb-4">
-                Your account is currently pending approval. Please wait for an administrator to approve your access.
+                Your account is currently pending approval. Please wait for an
+                administrator to approve your access.
               </p>
               <p className="text-sm text-gray-500 mb-6">
-                You will receive an email notification once your account has been approved.
+                You will receive an email notification once your account has
+                been approved.
               </p>
-              
+
               <div className="space-y-3">
                 <button
-                  onClick={() => navigate('/')}
+                  onClick={() => navigate("/")}
                   className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50"
                 >
                   Return to Homepage
@@ -105,9 +126,12 @@ const Dashboard: React.FC = () => {
           <div className="space-y-8">
             {/* Welcome Section */}
             <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 text-white">
-              <h2 className="text-2xl font-bold mb-2">Welcome back, {user?.full_name}!</h2>
+              <h2 className="text-2xl font-bold mb-2">
+                Welcome back, {user?.full_name}!
+              </h2>
               <p className="text-green-100">
-                Access your KWPHCDA dashboard and manage your healthcare services.
+                Access your KWPHCDA dashboard and manage your healthcare
+                services.
               </p>
             </div>
 
@@ -119,9 +143,11 @@ const Dashboard: React.FC = () => {
                     <Users className="h-6 w-6 text-blue-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Your Role</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      Your Role
+                    </p>
                     <p className="text-lg font-semibold text-gray-900 capitalize">
-                      {user?.role?.replace('_', ' ')}
+                      {user?.role?.replace("_", " ")}
                     </p>
                   </div>
                 </div>
@@ -147,7 +173,9 @@ const Dashboard: React.FC = () => {
                     <Building2 className="h-6 w-6 text-purple-600" />
                   </div>
                   <div className="ml-4">
-                    <p className="text-sm font-medium text-gray-600">Location</p>
+                    <p className="text-sm font-medium text-gray-600">
+                      Location
+                    </p>
                     <p className="text-lg font-semibold text-gray-900">
                       {user?.lga}
                     </p>
@@ -173,7 +201,9 @@ const Dashboard: React.FC = () => {
             {/* Quick Actions */}
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Quick Actions</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Quick Actions
+                </h3>
                 <div className="space-y-3">
                   {canAccessAdmin && (
                     <button
@@ -184,7 +214,9 @@ const Dashboard: React.FC = () => {
                         <div className="flex items-center">
                           <TrendingUp className="h-5 w-5 text-green-600 mr-3" />
                           <div>
-                            <span className="font-medium text-gray-900">Access Admin Panel</span>
+                            <span className="font-medium text-gray-900">
+                              Access Admin Panel
+                            </span>
                             <p className="text-sm text-gray-500 mt-1">
                               Manage users, facilities, and content
                             </p>
@@ -194,15 +226,17 @@ const Dashboard: React.FC = () => {
                       </div>
                     </button>
                   )}
-                  
+
                   <button
-                    onClick={() => navigate('/')}
+                    onClick={() => navigate("/")}
                     className="w-full text-left p-4 rounded-lg border border-gray-200 hover:bg-gray-50 transition-colors"
                   >
                     <div className="flex items-center">
                       <FileText className="h-5 w-5 text-green-600 mr-3" />
                       <div>
-                        <span className="font-medium text-gray-900">View Public Site</span>
+                        <span className="font-medium text-gray-900">
+                          View Public Site
+                        </span>
                         <p className="text-sm text-gray-500 mt-1">
                           Browse news, services, and information
                         </p>
@@ -213,24 +247,34 @@ const Dashboard: React.FC = () => {
               </div>
 
               <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-                <h3 className="text-lg font-semibold text-gray-900 mb-4">Account Information</h3>
+                <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                  Account Information
+                </h3>
                 <div className="space-y-3">
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Email:</span>
-                    <span className="text-sm font-medium text-gray-900">{user?.email}</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      {user?.email}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Username:</span>
-                    <span className="text-sm font-medium text-gray-900">@{user?.username}</span>
+                    <span className="text-sm font-medium text-gray-900">
+                      @{user?.username}
+                    </span>
                   </div>
                   <div className="flex justify-between">
                     <span className="text-sm text-gray-600">Gender:</span>
-                    <span className="text-sm font-medium text-gray-900 capitalize">{user?.gender}</span>
+                    <span className="text-sm font-medium text-gray-900 capitalize">
+                      {user?.gender}
+                    </span>
                   </div>
                   {user?.phc && (
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">PHC:</span>
-                      <span className="text-sm font-medium text-gray-900">{user.phc.name}</span>
+                      <span className="text-sm font-medium text-gray-900">
+                        {user.phc.name}
+                      </span>
                     </div>
                   )}
                 </div>
@@ -239,12 +283,18 @@ const Dashboard: React.FC = () => {
 
             {/* System Status */}
             <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">System Status</h3>
+              <h3 className="text-lg font-semibold text-gray-900 mb-4">
+                System Status
+              </h3>
               <div className="flex items-center p-3 bg-green-50 rounded-lg">
                 <CheckCircle className="h-5 w-5 text-green-500 mr-3" />
                 <div>
-                  <p className="text-sm font-medium text-gray-900">All systems operational</p>
-                  <p className="text-xs text-gray-500">Last updated: {new Date().toLocaleString()}</p>
+                  <p className="text-sm font-medium text-gray-900">
+                    All systems operational
+                  </p>
+                  <p className="text-xs text-gray-500">
+                    Last updated: {new Date().toLocaleString()}
+                  </p>
                 </div>
               </div>
             </div>

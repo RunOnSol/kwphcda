@@ -1,5 +1,7 @@
 import React from 'react';
+
 import { Navigate } from 'react-router-dom';
+
 import { useAuth } from '../context/AuthContext';
 import LoadingSpinner from './LoadingSpinner';
 
@@ -8,9 +10,9 @@ interface ProtectedRouteProps {
   requireApproval?: boolean;
 }
 
-const ProtectedRoute: React.FC<ProtectedRouteProps> = ({ 
-  children, 
-  requireApproval = false 
+const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
+  children,
+  requireApproval = false,
 }) => {
   const { user, loading } = useAuth();
 
@@ -22,7 +24,7 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/signin" replace />;
   }
 
-  if (requireApproval && user.status !== 'approved') {
+  if (requireApproval && user.status !== "approved") {
     return <Navigate to="/dashboard" replace />;
   }
 
