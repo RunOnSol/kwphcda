@@ -23,7 +23,9 @@ import {
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
   console.log("Current user:", user);
-  if (loading) {
+
+  // Show loading spinner only during initial authentication check and when actually loading
+  if (loading && !user) {
     return <LoadingSpinner />;
   }
 

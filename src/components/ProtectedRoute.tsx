@@ -16,17 +16,18 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, loading } = useAuth();
 
-  if (loading) {
+  // Show loading spinner only when actually loading and no user data
+  if (loading && !user) {
     return <LoadingSpinner />;
   }
 
+  // If no user, redirect to signin
   if (!user) {
     return <Navigate to="/signin" replace />;
   }
 
-  if (requireApproval && user.status !== "approved") {
-    return <Navigate to="/dashboard" replace />;
-  }
+  // If approval is required but user is not approved, still show the dashboard
+  // (AdminPanel component will handle showing pending approval message)
 
   return <>{children}</>;
 };
