@@ -2,6 +2,7 @@ import React from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import * as yup from 'yup';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../../context/AuthContext';
 import { LoginData } from '../../types';
 import { Eye, EyeOff, LogIn } from 'lucide-react';
@@ -17,6 +18,7 @@ interface LoginFormProps {
 
 const LoginForm: React.FC<LoginFormProps> = ({ onToggleForm }) => {
   const { signIn, loading } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = React.useState(false);
 
   const {
@@ -30,6 +32,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleForm }) => {
   const onSubmit = async (data: LoginData) => {
     try {
       await signIn(data.email, data.password);
+      navigate('/dashboard');
     } catch (error) {
       // Error is handled in AuthContext
     }

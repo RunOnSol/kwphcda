@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { useNavigate } from 'react-router-dom';
 
 import { useModal } from "../context/ModalContext";
+import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
 
 const navItems = [
@@ -20,6 +21,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { openModal } = useModal();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -48,7 +50,11 @@ const Navbar = () => {
   };
 
   const handleAuthClick = () => {
-    navigate('/auth');
+    if (user) {
+      navigate('/dashboard');
+    } else {
+      navigate('/signin');
+    }
   };
 
   return (
@@ -78,7 +84,7 @@ const Navbar = () => {
           onClick={handleAuthClick}
           className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
-          Login / Register
+          {user ? 'Dashboard' : 'Sign In'}
         </button>
 
         {/* Mobile Menu Button */}
@@ -110,7 +116,7 @@ const Navbar = () => {
               onClick={handleAuthClick}
               className="w-full text-left py-2 px-4 text-white bg-green-600 hover:bg-green-700 font-medium rounded-md transition-colors"
             >
-              Login / Register
+              {user ? 'Dashboard' : 'Sign In'}
             </button>
           </div>
         </div>

@@ -44,6 +44,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
   const refreshUser = async () => {
     try {
+      setState((prev) => ({ ...prev, loading: true }));
       const {
         data: { user: authUser },
       } = await supabase.auth.getUser();
@@ -69,6 +70,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         loading: false,
         error: "Failed to refresh user",
       }));
+    } finally {
+      // Loading state is handled in setState elsewhere
     }
   };
 
@@ -154,7 +157,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       if (data.user) {
         await refreshUser();
-        toast.success("Signed in successfully!");
+        toast.success(`Welcome back!`);
       }
     } catch (error: any) {
       setState((prev) => ({ ...prev, error: error.message, loading: false }));

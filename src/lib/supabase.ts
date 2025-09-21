@@ -48,7 +48,7 @@ export const getUserProfile = async (userId: string) => {
       phc:phcs(*)
     `)
     .eq('id', userId)
-    .single();
+    .maybeSingle();
   
   return { data, error };
 };

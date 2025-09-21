@@ -9,6 +9,7 @@ import {
   UserPlus,
 } from 'lucide-react';
 import { useForm } from 'react-hook-form';
+import { useNavigate } from 'react-router-dom';
 import * as yup from 'yup';
 
 import { yupResolver } from '@hookform/resolvers/yup';
@@ -46,6 +47,7 @@ interface SignupFormProps {
 
 const SignupForm: React.FC<SignupFormProps> = ({ onToggleForm }) => {
   const { signUp, loading } = useAuth();
+  const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [phcs, setPHCs] = useState<any[]>([]);
   const [filteredPHCs, setFilteredPHCs] = useState<any[]>([]);
@@ -90,6 +92,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onToggleForm }) => {
         ward: data.ward,
         phc_id: data.phc_id || null,
       });
+      navigate('/dashboard');
     } catch (error) {
       // Error is handled in AuthContext
     }

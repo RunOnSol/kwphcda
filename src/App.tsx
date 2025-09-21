@@ -9,62 +9,45 @@ import {
 
 import AdminPanel from './components/admin/AdminPanel';
 import AuthPage from './components/auth/AuthPage';
+import SigninPage from './components/auth/SigninPage';
+import SignupPage from './components/auth/SignupPage';
 import BlogPost from './components/blog/BlogPost';
-import BlogSection from './components/BlogSection';
-import ExecutiveSection from './components/ExecutiveSection';
-import Footer from './components/Footer';
-import Hero from './components/Hero';
-import ModalContainer from './components/ModalContainer';
-import Navbar from './components/Navbar';
+import LandingPage from './components/LandingPage';
+import LoadingSpinner from './components/LoadingSpinner';
+import ProtectedRoute from './components/ProtectedRoute';
 import {
   AuthProvider,
   useAuth,
 } from './context/AuthContext';
-import { ModalProvider } from './context/ModalContext';
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
-
+  console.log("Current user:", user);
   if (loading) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-gray-50">
-        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
-      </div>
-    );
+    return <LoadingSpinner />;
   }
 
-  // If user is logged in and approved, show admin panel
-  if (user && user.status === "approved") {
-    return <AdminPanel />;
-  }
-
-  // If user is logged in but not approved, show admin panel (it will handle the pending state)
-  if (user) {
-    return <AdminPanel />;
-  }
-
-  // Public routes for non-authenticated users
   return (
     <Routes>
-      <Route path="/auth" element={<AuthPage />} />
+      {/* Public routes */}
+      <Route path="/" element={<LandingPage />} />
+      <Route path="/signin" element={<SigninPage />} />
+      <Route path="/signup" element={<SignupPage />} />
       <Route path="/blog/:id" element={<BlogPost />} />
+
+      {/* Protected routes */}
+
       <Route
-        path="/"
+        path="/dashboard"
         element={
-          <ModalProvider>
-            <div className="min-h-screen bg-white flex flex-col">
-              <Navbar />
-              <main className="flex-grow">
-                <Hero />
-                <ExecutiveSection />
-                <BlogSection />
-              </main>
-              <Footer />
-              <ModalContainer />
-            </div>
-          </ModalProvider>
+          <ProtectedRoute requireApproval>
+            <AdminPanel />
+          </ProtectedRoute>
         }
       />
+
+      {/* Legacy auth route - redirect to signin */}
+      <Route path="/auth" element={<AuthPage />} />
     </Routes>
   );
 };
