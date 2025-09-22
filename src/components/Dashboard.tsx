@@ -21,11 +21,6 @@ const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
 
-  // If no user, redirect to signin
-  if (!user) {
-    return <Navigate to="/signin" replace />;
-  }
-
   const handleSignOut = async () => {
     await signOut();
     navigate("/");

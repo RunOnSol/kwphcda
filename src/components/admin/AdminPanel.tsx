@@ -10,7 +10,11 @@ const AdminPanel: React.FC = () => {
   const { user } = useAuth();
   const [activeTab, setActiveTab] = useState('dashboard');
 
-  if (!user || user.status !== 'approved') {
+  if (!user) {
+    return <Navigate to="/signin" replace />;
+  }
+
+  if (user.status !== 'approved') {
     return (
       <div className="min-h-screen flex items-center justify-center bg-gray-50">
         <div className="max-w-md w-full bg-white rounded-lg shadow-md p-6 text-center">
@@ -28,6 +32,14 @@ const AdminPanel: React.FC = () => {
           <p className="text-sm text-gray-500">
             You will receive an email notification once your account has been approved.
           </p>
+          <div className="mt-6">
+            <button
+              onClick={() => navigate('/dashboard')}
+              className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700"
+            >
+              Go to Dashboard
+            </button>
+          </div>
         </div>
       </div>
     );

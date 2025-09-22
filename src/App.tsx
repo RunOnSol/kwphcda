@@ -16,10 +16,9 @@ import Dashboard from "./components/Dashboard";
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
-  console.log("Current user:", user);
 
-  // Show loading spinner only during initial authentication check and when actually loading
-  if (loading && !user) {
+  // Show loading spinner during initial authentication check
+  if (loading) {
     return <LoadingSpinner />;
   }
 
