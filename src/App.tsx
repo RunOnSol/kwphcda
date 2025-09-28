@@ -8,18 +8,17 @@ import AuthPage from "./components/auth/AuthPage";
 import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
 import BlogPost from "./components/blog/BlogPost";
+import Dashboard from "./components/Dashboard";
 import LandingPage from "./components/LandingPage";
 import LoadingSpinner from "./components/LoadingSpinner";
 import ProtectedRoute from "./components/ProtectedRoute";
 import { AuthProvider, useAuth } from "./context/AuthContext";
-import Dashboard from "./components/Dashboard";
 
 const AppContent: React.FC = () => {
   const { user, loading } = useAuth();
-  console.log("Current user:", user);
 
-  // Show loading spinner only during initial authentication check and when actually loading
-  if (loading && !user) {
+  // Show loading spinner during initial authentication check
+  if (loading) {
     return <LoadingSpinner />;
   }
 

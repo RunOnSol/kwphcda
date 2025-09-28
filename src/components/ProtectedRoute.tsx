@@ -1,9 +1,9 @@
-import React from 'react';
+import React from "react";
 
-import { Navigate } from 'react-router-dom';
+import { Navigate } from "react-router-dom";
 
-import { useAuth } from '../context/AuthContext';
-import LoadingSpinner from './LoadingSpinner';
+import { useAuth } from "../context/AuthContext";
+import LoadingSpinner from "./LoadingSpinner";
 
 interface ProtectedRouteProps {
   children: React.ReactNode;
@@ -16,8 +16,8 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
 }) => {
   const { user, loading } = useAuth();
 
-  // Show loading spinner only when actually loading and no user data
-  if (loading && !user) {
+  // Show loading spinner during authentication check
+  if (loading) {
     return <LoadingSpinner />;
   }
 
@@ -26,8 +26,10 @@ const ProtectedRoute: React.FC<ProtectedRouteProps> = ({
     return <Navigate to="/signin" replace />;
   }
 
-  // If approval is required but user is not approved, still show the dashboard
-  // (AdminPanel component will handle showing pending approval message)
+  // If approval is required and user is not approved, redirect to dashboard
+  if (requireApproval && user.status !== "approved") {
+    return <Navigate to="/dashboard" replace />;
+  }
 
   return <>{children}</>;
 };

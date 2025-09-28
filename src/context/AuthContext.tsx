@@ -4,18 +4,12 @@ import React, {
   useContext,
   useEffect,
   useState,
-} from 'react';
+} from "react";
 
-import toast from 'react-hot-toast';
+import toast from "react-hot-toast";
 
-import {
-  getUserProfile,
-  supabase,
-} from '../lib/supabase';
-import {
-  AuthState,
-  User,
-} from '../types';
+import { getUserProfile, supabase } from "../lib/supabase";
+import { AuthState } from "../types";
 
 interface AuthContextType extends AuthState {
   signUp: (email: string, password: string, userData: any) => Promise<void>;
@@ -37,64 +31,6 @@ export const useAuth = () => {
 interface AuthProviderProps {
   children: ReactNode;
 }
-
-// Local storage keys
-const AUTH_STORAGE_KEY = "kwphcda_auth_user";
-const AUTH_SESSION_KEY = "kwphcda_auth_session";
-
-// Helper functions for localStorage
-const saveUserToStorage = (user: User | null) => {
-  try {
-    if (user) {
-      localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(user));
-    } else {
-      localStorage.removeItem(AUTH_STORAGE_KEY);
-    }
-  } catch (error) {
-    console.error("Error saving user to localStorage:", error);
-  }
-};
-
-const getUserFromStorage = (): User | null => {
-  try {
-    const stored = localStorage.getItem(AUTH_STORAGE_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("Error getting user from localStorage:", error);
-    return null;
-  }
-};
-
-const saveSessionToStorage = (session: any) => {
-  try {
-    if (session) {
-      localStorage.setItem(AUTH_SESSION_KEY, JSON.stringify(session));
-    } else {
-      localStorage.removeItem(AUTH_SESSION_KEY);
-    }
-  } catch (error) {
-    console.error("Error saving session to localStorage:", error);
-  }
-};
-
-const getSessionFromStorage = () => {
-  try {
-    const stored = localStorage.getItem(AUTH_SESSION_KEY);
-    return stored ? JSON.parse(stored) : null;
-  } catch (error) {
-    console.error("Error getting session from localStorage:", error);
-    return null;
-  }
-};
-
-const clearAuthStorage = () => {
-  try {
-    localStorage.removeItem(AUTH_STORAGE_KEY);
-    localStorage.removeItem(AUTH_SESSION_KEY);
-  } catch (error) {
-    console.error("Error clearing auth storage:", error);
-  }
-};
 
 export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const [state, setState] = useState<AuthState>({
@@ -120,7 +56,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           }));
-          saveUserToStorage(null);
           return;
         }
 
@@ -130,7 +65,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           loading: false,
           error: null,
         }));
-        saveUserToStorage(userProfile);
       } else {
         setState((prev) => ({
           ...prev,
@@ -138,7 +72,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           loading: false,
           error: null,
         }));
-        saveUserToStorage(null);
       }
     } catch (error) {
       console.error("Error refreshing user:", error);
@@ -146,9 +79,8 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         ...prev,
         user: null,
         loading: false,
-        error: "Failed to refresh user",
+        error: null,
       }));
-      saveUserToStorage(null);
     }
   };
 
@@ -157,15 +89,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
     const initializeAuth = async () => {
       try {
-        // First, try to get user from localStorage for immediate UI update
-        const storedUser = getUserFromStorage();
-        const storedSession = getSessionFromStorage();
-
-        if (storedUser && mounted) {
-          setState({ user: storedUser, loading: true, error: null });
-        }
-
-        // Then verify with Supabase
+        // Get current session on app load/reload
         const {
           data: { session },
           error: sessionError,
@@ -173,7 +97,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
         if (sessionError) {
           console.error("Session error:", sessionError);
-          clearAuthStorage();
           if (mounted) {
             setState({ user: null, loading: false, error: null });
           }
@@ -181,46 +104,47 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         }
 
         if (session?.user && mounted) {
-          // Save session to storage
-          saveSessionToStorage(session);
+          // User has active session, fetch profile
+          try {
+            const { data: userProfile, error: profileError } =
+              await getUserProfile(session.user.id);
 
-          // Fetch fresh user profile
-          const { data: userProfile, error: profileError } =
-            await getUserProfile(session.user.id);
+            if (profileError) {
+              console.error("Error fetching user profile:", profileError);
+              if (mounted) {
+                setState({ user: null, loading: false, error: null });
+              }
+              return;
+            }
 
-          if (profileError) {
-            console.error("Error fetching user profile:", profileError);
-            clearAuthStorage();
+            if (mounted) {
+              setState({ user: userProfile, loading: false, error: null });
+            }
+          } catch (profileError) {
+            console.error("Profile fetch error:", profileError);
             if (mounted) {
               setState({ user: null, loading: false, error: null });
             }
-            return;
-          }
-
-          if (mounted) {
-            setState({ user: userProfile, loading: false, error: null });
-            saveUserToStorage(userProfile);
           }
         } else {
-          // No session, clear storage
-          clearAuthStorage();
+          // No active session
           if (mounted) {
             setState({ user: null, loading: false, error: null });
           }
         }
       } catch (error) {
         console.error("Error initializing auth:", error);
-        clearAuthStorage();
         if (mounted) {
           setState({
             user: null,
             loading: false,
-            error: "Failed to initialize auth",
+            error: null,
           });
         }
       }
     };
 
+    // Initialize auth state
     initializeAuth();
 
     // Listen for auth changes
@@ -231,17 +155,15 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
 
       console.log("Auth state change:", event, session?.user?.id);
 
-      if (event === "SIGNED_IN" && session?.user) {
-        try {
-          saveSessionToStorage(session);
-
+      try {
+        if (event === "SIGNED_IN" && session?.user) {
+          // User signed in, fetch profile
           const { data: userProfile, error } = await getUserProfile(
             session.user.id
           );
 
           if (error) {
             console.error("Error fetching user profile on sign in:", error);
-            clearAuthStorage();
             setState((prev) => ({
               ...prev,
               user: null,
@@ -257,49 +179,41 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           }));
-          saveUserToStorage(userProfile);
-        } catch (error) {
-          console.error("Error handling sign in:", error);
-          clearAuthStorage();
+        } else if (event === "SIGNED_OUT") {
+          // User signed out
           setState((prev) => ({
             ...prev,
             user: null,
             loading: false,
             error: null,
           }));
+        } else if (event === "TOKEN_REFRESHED" && session?.user) {
+          // Token refreshed, optionally refresh user profile
+          console.log("Token refreshed for user:", session.user.id);
+          // Keep existing user data, no need to refetch unless needed
+        } else if (event === "USER_UPDATED" && session?.user) {
+          // User data updated, refresh profile
+          const { data: userProfile, error } = await getUserProfile(
+            session.user.id
+          );
+
+          if (!error && userProfile) {
+            setState((prev) => ({
+              ...prev,
+              user: userProfile,
+              loading: false,
+              error: null,
+            }));
+          }
         }
-      } else if (event === "SIGNED_OUT") {
-        clearAuthStorage();
+      } catch (error) {
+        console.error("Error handling auth state change:", error);
         setState((prev) => ({
           ...prev,
           user: null,
           loading: false,
           error: null,
         }));
-      } else if (event === "TOKEN_REFRESHED" && session?.user) {
-        try {
-          saveSessionToStorage(session);
-
-          // Optionally refresh user profile on token refresh
-          const storedUser = getUserFromStorage();
-          if (storedUser) {
-            const { data: userProfile, error } = await getUserProfile(
-              session.user.id
-            );
-
-            if (!error && userProfile) {
-              setState((prev) => ({
-                ...prev,
-                user: userProfile,
-                loading: false,
-                error: null,
-              }));
-              saveUserToStorage(userProfile);
-            }
-          }
-        } catch (error) {
-          console.error("Error handling token refresh:", error);
-        }
       }
     });
 
@@ -331,8 +245,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
 
       if (data.user && data.session) {
-        saveSessionToStorage(data.session);
-
         // Wait for the trigger to complete
         await new Promise((resolve) => setTimeout(resolve, 2000));
 
@@ -347,7 +259,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               loading: false,
               error: null,
             }));
-            saveUserToStorage(userProfile);
           } else {
             setState((prev) => ({
               ...prev,
@@ -355,7 +266,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
               loading: false,
               error: null,
             }));
-            saveUserToStorage(null);
           }
         } catch (refreshError) {
           console.log(
@@ -367,7 +277,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             loading: false,
             error: null,
           }));
-          saveUserToStorage(null);
         }
 
         toast.success(
@@ -377,7 +286,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     } catch (error: any) {
       console.error("Signup error:", error);
       setState((prev) => ({ ...prev, error: error.message, loading: false }));
-      clearAuthStorage();
       toast.error(
         error.message || "Failed to create account. Please try again."
       );
@@ -397,8 +305,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       if (error) throw error;
 
       if (data.user && data.session) {
-        saveSessionToStorage(data.session);
-
         const { data: userProfile, error: profileError } = await getUserProfile(
           data.user.id
         );
@@ -408,7 +314,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             "Error fetching user profile on sign in:",
             profileError
           );
-          clearAuthStorage();
           setState((prev) => ({
             ...prev,
             user: null,
@@ -425,12 +330,10 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           loading: false,
           error: null,
         }));
-        saveUserToStorage(userProfile);
         toast.success(`Welcome back, ${userProfile.full_name}!`);
       }
     } catch (error: any) {
       setState((prev) => ({ ...prev, error: error.message, loading: false }));
-      clearAuthStorage();
       toast.error(error.message);
       throw error;
     }
@@ -443,7 +346,6 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       const { error } = await supabase.auth.signOut();
       if (error) throw error;
 
-      clearAuthStorage();
       setState((prev) => ({
         ...prev,
         user: null,

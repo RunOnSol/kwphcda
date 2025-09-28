@@ -1,4 +1,4 @@
-import React from 'react';
+import React from "react";
 
 import {
   Activity,
@@ -9,22 +9,14 @@ import {
   FileText,
   TrendingUp,
   Users,
-} from 'lucide-react';
-import {
-  Navigate,
-  useNavigate,
-} from 'react-router-dom';
+} from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
-import { useAuth } from '../context/AuthContext';
+import { useAuth } from "../context/AuthContext";
 
 const Dashboard: React.FC = () => {
   const { user, signOut } = useAuth();
   const navigate = useNavigate();
-
-  // If no user, redirect to signin
-  if (!user) {
-    return <Navigate to="/signin" replace />;
-  }
 
   const handleSignOut = async () => {
     await signOut();
