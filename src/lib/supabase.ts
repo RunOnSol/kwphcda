@@ -1,16 +1,20 @@
-import { createClient } from '@supabase/supabase-js';
+import { createClient } from "@supabase/supabase-js";
 
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
 const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
 if (!supabaseUrl || !supabaseAnonKey) {
-  throw new Error('Missing Supabase environment variables');
+  throw new Error("Missing Supabase environment variables");
 }
 
 export const supabase = createClient(supabaseUrl, supabaseAnonKey);
 
 // Auth helpers
-export const signUp = async (email: string, password: string, userData: any) => {
+export const signUp = async (
+  email: string,
+  password: string,
+  userData: any
+) => {
   const { data, error } = await supabase.auth.signUp({
     email,
     password,
@@ -35,137 +39,188 @@ export const signOut = async () => {
 };
 
 export const getCurrentUser = async () => {
-  const { data: { user } } = await supabase.auth.getUser();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
   return user;
 };
 
 // Database helpers
 export const getUserProfile = async (userId: string) => {
   const { data, error } = await supabase
-    .from('users')
-    .select(`
+    .from("users")
+    .select(
+      `
       *,
       phc:phcs(*)
-    `)
-    .eq('id', userId)
+    `
+    )
+    .eq("id", userId)
     .maybeSingle();
-  
+
   return { data, error };
 };
 
 export const updateUserProfile = async (userId: string, updates: any) => {
   const { data, error } = await supabase
-    .from('users')
+    .from("users")
     .update(updates)
-    .eq('id', userId)
+    .eq("id", userId)
     .select()
     .single();
-  
+
   return { data, error };
 };
 
 export const getAllUsers = async () => {
   const { data, error } = await supabase
-    .from('users')
-    .select(`
+    .from("users")
+    .select(
+      `
       *,
       phc:phcs(*)
-    `)
-    .order('created_at', { ascending: false });
-  
+    `
+    )
+    .order("created_at", { ascending: false });
+
   return { data, error };
 };
 
 export const getAllPHCs = async () => {
   const { data, error } = await supabase
-    .from('phcs')
-    .select('*')
-    .order('name', { ascending: true });
-  
+    .from("phcs")
+    .select("*")
+    .order("name", { ascending: true });
+
   return { data, error };
 };
 
 export const createPHC = async (phcData: any) => {
   const { data, error } = await supabase
-    .from('phcs')
+    .from("phcs")
     .insert(phcData)
     .select()
     .single();
-  
+
   return { data, error };
 };
 
 export const updatePHC = async (id: string, updates: any) => {
   const { data, error } = await supabase
-    .from('phcs')
+    .from("phcs")
     .update(updates)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
-  
+
   return { data, error };
 };
 
 export const deletePHC = async (id: string) => {
-  const { error } = await supabase
-    .from('phcs')
-    .delete()
-    .eq('id', id);
-  
+  const { error } = await supabase.from("phcs").delete().eq("id", id);
+
   return { error };
 };
 
 export const getAllBlogPosts = async () => {
   const { data, error } = await supabase
-    .from('blog_posts')
-    .select(`
+    .from("blog_posts")
+    .select(
+      `
       *,
       author:users(full_name, username)
-    `)
-    .order('created_at', { ascending: false });
-  
+    `
+    )
+    .order("created_at", { ascending: false });
+
   return { data, error };
 };
 
 export const getBlogPost = async (id: string) => {
   const { data, error } = await supabase
-    .from('blog_posts')
-    .select(`
+    .from("blog_posts")
+    .select(
+      `
       *,
       author:users(full_name, username)
-    `)
-    .eq('id', id)
+    `
+    )
+    .eq("id", id)
     .single();
-  
+
   return { data, error };
 };
 
 export const createBlogPost = async (postData: any) => {
   const { data, error } = await supabase
-    .from('blog_posts')
+    .from("blog_posts")
     .insert(postData)
     .select()
     .single();
-  
+
   return { data, error };
 };
 
 export const updateBlogPost = async (id: string, updates: any) => {
   const { data, error } = await supabase
-    .from('blog_posts')
+    .from("blog_posts")
     .update(updates)
-    .eq('id', id)
+    .eq("id", id)
     .select()
     .single();
-  
+
   return { data, error };
 };
 
 export const deleteBlogPost = async (id: string) => {
-  const { error } = await supabase
-    .from('blog_posts')
-    .delete()
-    .eq('id', id);
-  
+  const { error } = await supabase.from("blog_posts").delete().eq("id", id);
+
+  return { error };
+};
+
+// Staff management functions
+export const getAllStaff = async () => {
+  const { data, error } = await supabase
+    .from("staff")
+    .select("*")
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+};
+
+export const getStaff = async (id: string) => {
+  const { data, error } = await supabase
+    .from("staff")
+    .select("*")
+    .eq("id", id)
+    .single();
+
+  return { data, error };
+};
+
+export const createStaff = async (staffData: any) => {
+  const { data, error } = await supabase
+    .from("staff")
+    .insert(staffData)
+    .select()
+    .single();
+
+  return { data, error };
+};
+
+export const updateStaff = async (id: string, updates: any) => {
+  const { data, error } = await supabase
+    .from("staff")
+    .update(updates)
+    .eq("id", id)
+    .select()
+    .single();
+
+  return { data, error };
+};
+
+export const deleteStaff = async (id: string) => {
+  const { error } = await supabase.from("staff").delete().eq("id", id);
+
   return { error };
 };

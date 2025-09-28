@@ -7,6 +7,7 @@ import AdminLayout from "./AdminLayout";
 import BlogManagement from "./BlogManagement";
 import Dashboard from "./Dashboard";
 import PHCManagement from "./PHCManagement";
+import StaffManagement from "./StaffManagement";
 import UserManagement from "./UserManagement";
 
 const AdminPanel: React.FC = () => {
@@ -71,6 +72,8 @@ const AdminPanel: React.FC = () => {
         return <UserManagement />;
       case "phcs":
         return <PHCManagement />;
+      case "staff":
+        return <StaffManagement />;
       case "blog":
         return <BlogManagement />;
       case "analytics":

@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState } from "react";
 
 import {
   BarChart3,
@@ -11,9 +11,9 @@ import {
   Shield,
   Users,
   X,
-} from 'lucide-react';
+} from "lucide-react";
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "../../context/AuthContext";
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -31,6 +31,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
 
   const canAccessUsers = user?.role === "super_admin" || user?.role === "admin";
   const canAccessPHCs = user?.role === "super_admin" || user?.role === "admin";
+  const canAccessStaff = user?.role === "super_admin" || user?.role === "admin";
   const canAccessBlog = ["super_admin", "admin", "manager", "blogger"].includes(
     user?.role || ""
   );
@@ -48,6 +49,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       label: "PHC Management",
       icon: Building2,
       show: canAccessPHCs,
+    },
+    {
+      id: "staff",
+      label: "Staff Management",
+      icon: Users,
+      show: canAccessStaff,
     },
     {
       id: "blog",
