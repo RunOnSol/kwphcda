@@ -10,17 +10,16 @@ import SignupPage from "./components/auth/SignupPage";
 import BlogPost from "./components/blog/BlogPost";
 import Dashboard from "./components/Dashboard";
 import LandingPage from "./components/LandingPage";
-import LoadingSpinner from "./components/LoadingSpinner";
 import ProtectedRoute from "./components/ProtectedRoute";
-import { AuthProvider, useAuth } from "./context/AuthContext";
+import { AuthProvider } from "./context/AuthContext";
 
 const AppContent: React.FC = () => {
-  const { user, loading } = useAuth();
+  // const { user, loading } = useAuth();
 
-  // Show loading spinner during initial authentication check
-  if (loading) {
-    return <LoadingSpinner />;
-  }
+  // // Show loading spinner during initial authentication check
+  // if (loading) {
+  //   return <LoadingSpinner />;
+  // }
 
   return (
     <Routes>
