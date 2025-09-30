@@ -3,8 +3,8 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
+import { useAuth } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
-// import { useAuth } from "../context/AuthContext";
 import Logo from "./Logo";
 
 const navItems = [
@@ -21,7 +21,7 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { openModal } = useModal();
-  // const { user } = useAuth();
+  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -49,13 +49,13 @@ const Navbar = () => {
     setIsMenuOpen(false);
   };
 
-  // const handleAuthClick = () => {
-  //   if (user) {
-  //     navigate("/dashboard");
-  //   } else {
-  //     navigate("/signin");
-  //   }
-  // };
+  const handleAuthClick = () => {
+    if (user) {
+      navigate("/dashboard");
+    } else {
+      navigate("/signin");
+    }
+  };
 
   return (
     <header
@@ -80,12 +80,12 @@ const Navbar = () => {
         </nav>
 
         {/* Auth Button - Desktop */}
-        {/* <button
+        <button
           onClick={handleAuthClick}
           className="hidden md:inline-flex items-center px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
         >
-          {user ? 'Dashboard' : 'Sign In'}
-        </button> */}
+          {user ? "Dashboard" : "Sign In"}
+        </button>
 
         {/* Mobile Menu Button */}
         <button
@@ -112,12 +112,12 @@ const Navbar = () => {
             ))}
 
             {/* Auth Button - Mobile */}
-            {/* <button
+            <button
               onClick={handleAuthClick}
               className="w-full text-left py-2 px-4 text-white bg-green-600 hover:bg-green-700 font-medium rounded-md transition-colors"
             >
-              {user ? 'Dashboard' : 'Sign In'}
-            </button> */}
+              {user ? "Dashboard" : "Sign In"}
+            </button>
           </div>
         </div>
       )}
