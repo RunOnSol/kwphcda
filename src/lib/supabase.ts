@@ -224,3 +224,36 @@ export const deleteStaff = async (id: string) => {
 
   return { error };
 };
+
+export const uploadBlogImage = async (file: File) => {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(7)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from("blog-images")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("blog-images").getPublicUrl(filePath);
+
+  return { data: { path: filePath, url: publicUrl }, error: null };
+};
+
+export const deleteBlogImage = async (imagePath: string) => {
+  const { error } = await supabase.storage
+    .from("blog-images")
+    .remove([imagePath]);
+
+  return { error };
+};

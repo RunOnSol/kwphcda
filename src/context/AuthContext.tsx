@@ -150,71 +150,73 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // Listen for auth changes
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (event, session) => {
+    } = supabase.auth.onAuthStateChange((event, session) => {
       if (!mounted) return;
 
       console.log("Auth state change:", event, session?.user?.id);
 
-      try {
-        if (event === "SIGNED_IN" && session?.user) {
-          // User signed in, fetch profile
-          const { data: userProfile, error } = await getUserProfile(
-            session.user.id
-          );
+      (async () => {
+        try {
+          if (event === "SIGNED_IN" && session?.user) {
+            // User signed in, fetch profile
+            const { data: userProfile, error } = await getUserProfile(
+              session.user.id
+            );
 
-          if (error) {
-            console.error("Error fetching user profile on sign in:", error);
-            setState((prev) => ({
-              ...prev,
-              user: null,
-              loading: false,
-              error: null,
-            }));
-            return;
-          }
+            if (error) {
+              console.error("Error fetching user profile on sign in:", error);
+              setState((prev) => ({
+                ...prev,
+                user: null,
+                loading: false,
+                error: null,
+              }));
+              return;
+            }
 
-          setState((prev) => ({
-            ...prev,
-            user: userProfile,
-            loading: false,
-            error: null,
-          }));
-        } else if (event === "SIGNED_OUT") {
-          // User signed out
-          setState((prev) => ({
-            ...prev,
-            user: null,
-            loading: false,
-            error: null,
-          }));
-        } else if (event === "TOKEN_REFRESHED" && session?.user) {
-          // Token refreshed, optionally refresh user profile
-          console.log("Token refreshed for user:", session.user.id);
-          // Keep existing user data, no need to refetch unless needed
-        } else if (event === "USER_UPDATED" && session?.user) {
-          // User data updated, refresh profile
-          const { data: userProfile, error } = await getUserProfile(
-            session.user.id
-          );
-
-          if (!error && userProfile) {
             setState((prev) => ({
               ...prev,
               user: userProfile,
               loading: false,
               error: null,
             }));
+          } else if (event === "SIGNED_OUT") {
+            // User signed out
+            setState((prev) => ({
+              ...prev,
+              user: null,
+              loading: false,
+              error: null,
+            }));
+          } else if (event === "TOKEN_REFRESHED" && session?.user) {
+            // Token refreshed, optionally refresh user profile
+            console.log("Token refreshed for user:", session.user.id);
+            // Keep existing user data, no need to refetch unless needed
+          } else if (event === "USER_UPDATED" && session?.user) {
+            // User data updated, refresh profile
+            const { data: userProfile, error } = await getUserProfile(
+              session.user.id
+            );
+
+            if (!error && userProfile) {
+              setState((prev) => ({
+                ...prev,
+                user: userProfile,
+                loading: false,
+                error: null,
+              }));
+            }
           }
+        } catch (error) {
+          console.error("Error handling auth state change:", error);
+          setState((prev) => ({
+            ...prev,
+            user: null,
+            loading: false,
+            error: null,
+          }));
         }
-      } catch (error) {
-        console.error("Error handling auth state change:", error);
-        setState((prev) => ({
-          ...prev,
-          user: null,
-          loading: false,
-          error: null,
-        }));
-      }
+      })();
     });
 
     return () => {

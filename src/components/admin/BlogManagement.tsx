@@ -1,30 +1,28 @@
-import React, {
-  useEffect,
-  useState,
-} from 'react';
+import React, { useEffect, useRef, useState } from "react";
 
-import { format } from 'date-fns';
+import { format } from "date-fns";
 import {
   Calendar,
-  Edit,
+  CreditCard as Edit,
   FileText,
   Plus,
   Search,
   Trash2,
-} from 'lucide-react';
-import toast from 'react-hot-toast';
+  Upload,
+  X,
+} from "lucide-react";
+import toast from "react-hot-toast";
 
-import { useAuth } from '../../context/AuthContext';
+import { useAuth } from "../../context/AuthContext";
 import {
   createBlogPost,
+  deleteBlogImage,
   deleteBlogPost,
   getAllBlogPosts,
   updateBlogPost,
-} from '../../lib/supabase';
-import {
-  BLOG_CATEGORIES,
-  BlogPost,
-} from '../../types';
+  uploadBlogImage,
+} from "../../lib/supabase";
+import { BLOG_CATEGORIES, BlogPost } from "../../types";
 
 const BlogManagement: React.FC = () => {
   const { user } = useAuth();
@@ -42,6 +40,11 @@ const BlogManagement: React.FC = () => {
     image_url: "",
     status: "draft" as "draft" | "published" | "archived",
   });
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string>("");
+  const [currentImagePath, setCurrentImagePath] = useState<string>("");
+  const [uploading, setUploading] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetchPosts();
@@ -60,12 +63,81 @@ const BlogManagement: React.FC = () => {
     }
   };
 
+  const handleImageSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("Image size must be less than 5MB");
+      return;
+    }
+
+    const allowedTypes = [
+      "image/jpeg",
+      "image/jpg",
+      "image/png",
+      "image/gif",
+      "image/webp",
+    ];
+    if (!allowedTypes.includes(file.type)) {
+      toast.error("Only JPEG, PNG, GIF, and WebP images are allowed");
+      return;
+    }
+
+    setImageFile(file);
+    const reader = new FileReader();
+    reader.onloadend = () => {
+      setImagePreview(reader.result as string);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const handleRemoveImage = async () => {
+    if (currentImagePath) {
+      try {
+        const pathParts = currentImagePath.split("/");
+        const fileName = pathParts[pathParts.length - 1];
+        await deleteBlogImage(fileName);
+      } catch (error) {
+        console.error("Error deleting old image:", error);
+      }
+    }
+
+    setImageFile(null);
+    setImagePreview("");
+    setCurrentImagePath("");
+    setFormData((prev) => ({ ...prev, image_url: "" }));
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     try {
+      setUploading(true);
+      let imageUrl = formData.image_url;
+
+      if (imageFile) {
+        if (currentImagePath) {
+          const pathParts = currentImagePath.split("/");
+          const fileName = pathParts[pathParts.length - 1];
+          await deleteBlogImage(fileName);
+        }
+
+        const { data: uploadData, error: uploadError } = await uploadBlogImage(
+          imageFile
+        );
+        if (uploadError) {
+          throw new Error("Failed to upload image");
+        }
+        imageUrl = uploadData?.url || "";
+      }
+
       const postData = {
         ...formData,
+        image_url: imageUrl,
         author_id: user?.id,
       };
 
@@ -99,6 +171,8 @@ const BlogManagement: React.FC = () => {
     } catch (error) {
       console.error("Error saving post:", error);
       toast.error("Failed to save post");
+    } finally {
+      setUploading(false);
     }
   };
 
@@ -112,6 +186,10 @@ const BlogManagement: React.FC = () => {
       image_url: post.image_url || "",
       status: post.status,
     });
+    if (post.image_url) {
+      setImagePreview(post.image_url);
+      setCurrentImagePath(post.image_url);
+    }
     setShowModal(true);
   };
 
@@ -119,6 +197,13 @@ const BlogManagement: React.FC = () => {
     if (!confirm("Are you sure you want to delete this post?")) return;
 
     try {
+      const post = posts.find((p) => p.id === id);
+      if (post?.image_url) {
+        const pathParts = post.image_url.split("/");
+        const fileName = pathParts[pathParts.length - 1];
+        await deleteBlogImage(fileName);
+      }
+
       const { error } = await deleteBlogPost(id);
       if (error) throw error;
 
@@ -139,8 +224,14 @@ const BlogManagement: React.FC = () => {
       image_url: "",
       status: "draft",
     });
+    setImageFile(null);
+    setImagePreview("");
+    setCurrentImagePath("");
     setEditingPost(null);
     setShowModal(false);
+    if (fileInputRef.current) {
+      fileInputRef.current.value = "";
+    }
   };
 
   const filteredPosts = posts.filter((post) => {
@@ -358,21 +449,51 @@ const BlogManagement: React.FC = () => {
               </div>
 
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Image URL (Optional)
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  Blog Image (Optional)
                 </label>
-                <input
-                  type="url"
-                  value={formData.image_url}
-                  onChange={(e) =>
-                    setFormData((prev) => ({
-                      ...prev,
-                      image_url: e.target.value,
-                    }))
-                  }
-                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
-                  placeholder="https://example.com/image.jpg"
-                />
+                <div className="space-y-3">
+                  {imagePreview ? (
+                    <div className="relative inline-block">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="h-48 w-auto object-cover rounded-md border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute top-2 right-2 p-1 bg-red-600 text-white rounded-full hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="flex items-center justify-center w-full">
+                      <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 hover:bg-gray-100">
+                        <div className="flex flex-col items-center justify-center pt-5 pb-6">
+                          <Upload className="w-8 h-8 mb-2 text-gray-400" />
+                          <p className="mb-2 text-sm text-gray-500">
+                            <span className="font-semibold">
+                              Click to upload
+                            </span>{" "}
+                            or drag and drop
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            PNG, JPG, GIF, WebP (max 5MB)
+                          </p>
+                        </div>
+                        <input
+                          ref={fileInputRef}
+                          type="file"
+                          className="hidden"
+                          accept="image/jpeg,image/jpg,image/png,image/gif,image/webp"
+                          onChange={handleImageSelect}
+                        />
+                      </label>
+                    </div>
+                  )}
+                </div>
               </div>
 
               <div>
@@ -423,9 +544,14 @@ const BlogManagement: React.FC = () => {
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  disabled={uploading}
+                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed"
                 >
-                  {editingPost ? "Update Post" : "Create Post"}
+                  {uploading
+                    ? "Uploading..."
+                    : editingPost
+                    ? "Update Post"
+                    : "Create Post"}
                 </button>
               </div>
             </form>

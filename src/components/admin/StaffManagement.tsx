@@ -43,7 +43,6 @@ const StaffManagement: React.FC = () => {
   });
 
   const [formData, setFormData] = useState({
-    sn: "",
     name: "",
     psn: "",
     gl: "",
@@ -127,6 +126,16 @@ const StaffManagement: React.FC = () => {
     setFilteredStaff(filtered);
   };
 
+  const generateStaffNumber = () => {
+    const numericStaffNumbers = staff
+      .map((s) => parseInt(s.sn))
+      .filter((n) => !isNaN(n));
+
+    const maxNumber =
+      numericStaffNumbers.length > 0 ? Math.max(...numericStaffNumbers) : 0;
+    return (maxNumber + 1).toString();
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
@@ -142,11 +151,14 @@ const StaffManagement: React.FC = () => {
         );
         toast.success("Staff updated successfully");
       } else {
-        const { data, error } = await createStaff(formData);
+        const staffNumber = generateStaffNumber();
+        const staffData = { ...formData, sn: staffNumber };
+
+        const { data, error } = await createStaff(staffData);
         if (error) throw error;
 
         setStaff([data, ...staff]);
-        toast.success("Staff created successfully");
+        toast.success(`Staff created successfully with number: ${staffNumber}`);
       }
 
       resetForm();
@@ -159,7 +171,6 @@ const StaffManagement: React.FC = () => {
   const handleEdit = (member: Staff) => {
     setEditingStaff(member);
     setFormData({
-      sn: member.sn,
       name: member.name,
       psn: member.psn || "",
       gl: member.gl || "",
@@ -197,7 +208,6 @@ const StaffManagement: React.FC = () => {
 
   const resetForm = () => {
     setFormData({
-      sn: "",
       name: "",
       psn: "",
       gl: "",
@@ -753,23 +763,25 @@ const StaffManagement: React.FC = () => {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-1">
-                    Staff Number *
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={formData.sn}
-                    onChange={(e) =>
-                      setFormData((prev) => ({ ...prev, sn: e.target.value }))
-                    }
-                    className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
-                    placeholder="e.g., KW/001/2024"
-                  />
+              {!editingStaff && (
+                <div className="bg-blue-50 border border-blue-200 rounded-md p-4 mb-4">
+                  <p className="text-sm text-blue-800">
+                    <span className="font-semibold">Note:</span> Staff number
+                    will be automatically generated when you save this record.
+                  </p>
                 </div>
+              )}
 
+              {editingStaff && (
+                <div className="bg-gray-50 border border-gray-200 rounded-md p-4 mb-4">
+                  <p className="text-sm text-gray-700">
+                    <span className="font-semibold">Staff Number:</span>{" "}
+                    {editingStaff.sn}
+                  </p>
+                </div>
+              )}
+
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
                     Full Name *
