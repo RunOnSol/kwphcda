@@ -183,7 +183,7 @@ export const getAllStaff = async () => {
   const { data, error } = await supabase
     .from("staff")
     .select("*")
-    .order("created_at", { ascending: false });
+    .order("created_at", { ascending: true });
 
   return { data, error };
 };
