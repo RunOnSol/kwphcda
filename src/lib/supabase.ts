@@ -183,7 +183,7 @@ export const getAllStaff = async () => {
   const { data, error } = await supabase
     .from("staff")
     .select("*")
-    .order("created_at", { ascending: true });
+    .order("sn", { ascending: true });
 
   return { data, error };
 };
@@ -193,7 +193,7 @@ export const getStaff = async (id: string) => {
     .from("staff")
     .select("*")
     .eq("id", id)
-    .single();
+    .maybeSingle();
 
   return { data, error };
 };
@@ -203,7 +203,7 @@ export const createStaff = async (staffData: any) => {
     .from("staff")
     .insert(staffData)
     .select()
-    .single();
+    .maybeSingle();
 
   return { data, error };
 };
@@ -214,7 +214,7 @@ export const updateStaff = async (id: string, updates: any) => {
     .update(updates)
     .eq("id", id)
     .select()
-    .single();
+    .maybeSingle();
 
   return { data, error };
 };
