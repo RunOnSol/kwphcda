@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import { BrowserRouter as Router, Route, Routes } from "react-router-dom";
 
 import AdminPanel from "./components/admin/AdminPanel";
+import ClockInOut from "./components/attendance/ClockInOut";
 import AuthPage from "./components/auth/AuthPage";
 import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
@@ -30,6 +31,7 @@ const AppContent: React.FC = () => {
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/blog/:id" element={<BlogPost />} />
       <Route path="/staff/email" element={<EmailGeneration />} />
+      <Route path="/attendance" element={<ClockInOut />} />
 
       {/* Protected routes */}
       <Route

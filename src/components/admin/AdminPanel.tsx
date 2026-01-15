@@ -6,6 +6,7 @@ import { useAuth } from "../../context/AuthContext";
 import ActivityLogs from "./ActivityLogs";
 import AdminLayout from "./AdminLayout";
 import Analytics from "./Analytics";
+import AttendanceManagement from "./AttendanceManagement";
 import BlogManagement from "./BlogManagement";
 import Dashboard from "./Dashboard";
 import PHCManagement from "./PHCManagement";
@@ -77,6 +78,8 @@ const AdminPanel: React.FC = () => {
         return <PHCManagement />;
       case "staff":
         return <StaffManagement />;
+      case "attendance":
+        return <AttendanceManagement />;
       case "blog":
         return <BlogManagement />;
       case "activity_logs":

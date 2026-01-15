@@ -56,7 +56,7 @@ const ActivityLogs: React.FC = () => {
     try {
       const { data, error } = await getActivityLogs({ limit: 1000 });
       if (error) throw error;
-      setLogs(data as any || []);
+      setLogs(data || []);
     } catch (error) {
       console.error('Error fetching activity logs:', error);
       toast.error('Failed to fetch activity logs');

@@ -1,8 +1,11 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Building2, FileText, TrendingUp, Clock, CheckCircle } from 'lucide-react';
-import { getAllUsers, getAllPHCs, getAllBlogPosts } from '../../lib/supabase';
+import { Users, Building2, FileText, TrendingUp, Clock, CheckCircle, Key } from 'lucide-react';
+import { getAllUsers, getAllPHCs, getAllBlogPosts, supabase } from '../../lib/supabase';
+import { useAuth } from '../../context/AuthContext';
+import toast from 'react-hot-toast';
 
 const Dashboard: React.FC = () => {
+  const { user } = useAuth();
   const [stats, setStats] = useState({
     totalUsers: 0,
     pendingUsers: 0,
@@ -10,16 +13,32 @@ const Dashboard: React.FC = () => {
     activePHCs: 0,
     totalPosts: 0,
     publishedPosts: 0,
+    attendanceToday: 0,
+    currentlyClocked: 0,
   });
   const [loading, setLoading] = useState(true);
+  const [approvalCode, setApprovalCode] = useState('');
+  const [codeExpiry, setCodeExpiry] = useState<Date | null>(null);
+  const [generatingCode, setGeneratingCode] = useState(false);
 
   useEffect(() => {
     const fetchStats = async () => {
       try {
-        const [usersResult, phcsResult, postsResult] = await Promise.all([
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        const [usersResult, phcsResult, postsResult, attendanceResult, clockedInResult] = await Promise.all([
           getAllUsers(),
           getAllPHCs(),
           getAllBlogPosts(),
+          supabase
+            .from('attendance_records')
+            .select('*', { count: 'exact' })
+            .gte('clock_in_time', today.toISOString()),
+          supabase
+            .from('attendance_records')
+            .select('*', { count: 'exact' })
+            .eq('status', 'clocked_in'),
         ]);
 
         const users = usersResult.data || [];
@@ -33,6 +52,8 @@ const Dashboard: React.FC = () => {
           activePHCs: phcs.filter(p => p.status === 'active').length,
           totalPosts: posts.length,
           publishedPosts: posts.filter(p => p.status === 'published').length,
+          attendanceToday: attendanceResult.count || 0,
+          currentlyClocked: clockedInResult.count || 0,
         });
       } catch (error) {
         console.error('Error fetching stats:', error);
@@ -42,7 +63,46 @@ const Dashboard: React.FC = () => {
     };
 
     fetchStats();
+    const interval = setInterval(fetchStats, 30000);
+    return () => clearInterval(interval);
   }, []);
+
+  const generateApprovalCode = async () => {
+    setGeneratingCode(true);
+    try {
+      await supabase
+        .from('attendance_approval_codes')
+        .update({ is_active: false })
+        .eq('is_active', true);
+
+      const code = Math.floor(100000 + Math.random() * 900000).toString();
+      const expiresAt = new Date(Date.now() + 30000);
+
+      const { error } = await supabase
+        .from('attendance_approval_codes')
+        .insert({
+          code,
+          generated_by: user?.id,
+          expires_at: expiresAt.toISOString(),
+          is_active: true,
+        });
+
+      if (error) throw error;
+
+      setApprovalCode(code);
+      setCodeExpiry(expiresAt);
+      toast.success('Approval code generated!');
+
+      setTimeout(() => {
+        setApprovalCode('');
+        setCodeExpiry(null);
+      }, 30000);
+    } catch (error: any) {
+      toast.error('Error generating approval code');
+    } finally {
+      setGeneratingCode(false);
+    }
+  };
 
   const statCards = [
     {
@@ -73,9 +133,25 @@ const Dashboard: React.FC = () => {
       title: 'Published Posts',
       value: stats.publishedPosts,
       icon: FileText,
-      color: 'bg-purple-500',
-      textColor: 'text-purple-600',
-      bgColor: 'bg-purple-50',
+      color: 'bg-teal-500',
+      textColor: 'text-teal-600',
+      bgColor: 'bg-teal-50',
+    },
+    {
+      title: 'Currently Clocked In',
+      value: stats.currentlyClocked,
+      icon: CheckCircle,
+      color: 'bg-emerald-500',
+      textColor: 'text-emerald-600',
+      bgColor: 'bg-emerald-50',
+    },
+    {
+      title: 'Attendance Today',
+      value: stats.attendanceToday,
+      icon: TrendingUp,
+      textColor: 'text-orange-600',
+      bgColor: 'bg-orange-50',
+      color: 'bg-orange-500',
     },
   ];
 
@@ -98,7 +174,7 @@ const Dashboard: React.FC = () => {
       </div>
 
       {/* Stats Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {statCards.map((stat, index) => {
           const Icon = stat.icon;
           return (
@@ -115,6 +191,44 @@ const Dashboard: React.FC = () => {
             </div>
           );
         })}
+      </div>
+
+      {/* Attendance Code Generator */}
+      <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-6 text-white">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-xl font-bold mb-1">Attendance Approval Code</h3>
+            <p className="text-blue-100 text-sm">Generate a 6-digit code for staff attendance approval</p>
+          </div>
+          <Key className="w-10 h-10 text-blue-200" />
+        </div>
+
+        {approvalCode ? (
+          <div className="bg-white rounded-lg p-6 text-center">
+            <div className="text-5xl font-bold text-blue-600 tracking-widest mb-3">
+              {approvalCode}
+            </div>
+            <div className="text-gray-600 text-sm mb-3">
+              Expires in {codeExpiry ? Math.max(0, Math.ceil((codeExpiry.getTime() - Date.now()) / 1000)) : 0}s
+            </div>
+            <div className="h-2 bg-gray-200 rounded-full overflow-hidden">
+              <div
+                className="h-full bg-blue-600 transition-all duration-1000"
+                style={{
+                  width: codeExpiry ? `${Math.max(0, ((codeExpiry.getTime() - Date.now()) / 30000) * 100)}%` : '0%'
+                }}
+              />
+            </div>
+          </div>
+        ) : (
+          <button
+            onClick={generateApprovalCode}
+            disabled={generatingCode}
+            className="w-full bg-white text-blue-600 py-3 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
+          >
+            {generatingCode ? 'Generating...' : 'Generate New Code'}
+          </button>
+        )}
       </div>
 
       {/* Quick Actions */}

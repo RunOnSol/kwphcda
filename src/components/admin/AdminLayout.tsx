@@ -4,6 +4,7 @@ import {
   Activity,
   BarChart3,
   Building2,
+  Clock,
   FileText,
   Home,
   LogOut,
@@ -37,6 +38,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     user?.role || ""
   );
   const canAccessActivityLogs = user?.role === "super_admin" || user?.role === "admin";
+  const canAccessAttendance = ["super_admin", "admin", "manager", "phc_admin"].includes(
+    user?.role || ""
+  );
 
   const menuItems = [
     { id: "dashboard", label: "Dashboard", icon: Home, show: true },
@@ -57,6 +61,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       label: "Staff Management",
       icon: Users,
       show: canAccessStaff,
+    },
+    {
+      id: "attendance",
+      label: "Attendance",
+      icon: Clock,
+      show: canAccessAttendance,
     },
     {
       id: "blog",
@@ -186,6 +196,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                   ? "PHC Management"
                   : activeTab === "staff"
                   ? "Staff Management"
+                  : activeTab === "attendance"
+                  ? "Attendance Management"
                   : activeTab === "blog"
                   ? "Blog Management"
                   : activeTab === "activity_logs"

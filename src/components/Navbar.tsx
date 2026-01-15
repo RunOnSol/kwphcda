@@ -83,6 +83,12 @@ const Navbar = () => {
           >
             Staff Email
           </button>
+           <button
+            onClick={() => navigate('/attendance')}
+            className="text-green-800 hover:text-green-600 font-medium transition-colors"
+          >
+            Staff Attendance
+          </button>
         </nav>
 
         {/* Auth Button - Desktop */}
@@ -125,6 +131,17 @@ const Navbar = () => {
               className="text-green-800 hover:text-green-600 py-2 px-4 text-left font-medium border-b border-green-100 transition-colors"
             >
               Staff Email
+            </button>
+
+            
+            <button
+              onClick={() => {
+                navigate('/attendance');
+                setIsMenuOpen(false);
+              }}
+              className="text-green-800 hover:text-green-600 py-2 px-4 text-left font-medium border-b border-green-100 transition-colors"
+            >
+              Staff Attendance
             </button>
 
             {/* Auth Button - Mobile */}

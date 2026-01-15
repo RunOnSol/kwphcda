@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Users, Building2, FileText, Mail, Activity, TrendingUp, Calendar } from 'lucide-react';
+import { Users, Building2, FileText, Mail, Activity, TrendingUp, Calendar, Clock, CheckCircle, LogIn } from 'lucide-react';
 import { supabase } from '../../lib/supabase';
 import { format } from 'date-fns';
 import { useAuth } from '../../context/AuthContext';
@@ -15,6 +15,10 @@ interface Stats {
   totalStaff: number;
   staffEmails: number;
   recentActivities: number;
+  totalAttendance: number;
+  attendanceToday: number;
+  currentlyClocked: number;
+  attendanceThisWeek: number;
 }
 
 const Analytics: React.FC = () => {
@@ -29,6 +33,10 @@ const Analytics: React.FC = () => {
     totalStaff: 0,
     staffEmails: 0,
     recentActivities: 0,
+    totalAttendance: 0,
+    attendanceToday: 0,
+    currentlyClocked: 0,
+    attendanceThisWeek: 0,
   });
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
@@ -54,6 +62,10 @@ const Analytics: React.FC = () => {
         return;
       }
 
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const weekAgo = new Date(Date.now() - 7 * 24 * 60 * 60 * 1000);
+
       const [
         usersResult,
         phcsResult,
@@ -61,6 +73,10 @@ const Analytics: React.FC = () => {
         staffResult,
         emailsResult,
         activitiesResult,
+        totalAttendanceResult,
+        attendanceTodayResult,
+        currentlyClockedResult,
+        attendanceWeekResult,
       ] = await Promise.all([
         supabase.from('users').select('id, status', { count: 'exact' }),
         supabase.from('phcs').select('id', { count: 'exact' }),
@@ -70,7 +86,20 @@ const Analytics: React.FC = () => {
         supabase
           .from('user_activity_logs')
           .select('id', { count: 'exact' })
-          .gte('created_at', new Date(Date.now() - 7 * 24 * 60 * 60 * 1000).toISOString()),
+          .gte('created_at', weekAgo.toISOString()),
+        supabase.from('attendance_records').select('id', { count: 'exact' }),
+        supabase
+          .from('attendance_records')
+          .select('id', { count: 'exact' })
+          .gte('clock_in_time', today.toISOString()),
+        supabase
+          .from('attendance_records')
+          .select('id', { count: 'exact' })
+          .eq('status', 'clocked_in'),
+        supabase
+          .from('attendance_records')
+          .select('id', { count: 'exact' })
+          .gte('clock_in_time', weekAgo.toISOString()),
       ]);
 
       if (usersResult.error) {
@@ -111,6 +140,10 @@ const Analytics: React.FC = () => {
         totalStaff: staffResult.count || 0,
         staffEmails: emailsResult.count || 0,
         recentActivities: activitiesResult.count || 0,
+        totalAttendance: totalAttendanceResult.count || 0,
+        attendanceToday: attendanceTodayResult.count || 0,
+        currentlyClocked: currentlyClockedResult.count || 0,
+        attendanceThisWeek: attendanceWeekResult.count || 0,
       });
 
       if (isRefreshing) {
@@ -210,6 +243,30 @@ const Analytics: React.FC = () => {
       color: 'bg-red-500',
       textColor: 'text-red-600',
       bgLight: 'bg-red-50',
+    },
+    {
+      title: 'Total Attendance Records',
+      value: stats.totalAttendance,
+      icon: Clock,
+      color: 'bg-cyan-500',
+      textColor: 'text-cyan-600',
+      bgLight: 'bg-cyan-50',
+    },
+    {
+      title: 'Attendance Today',
+      value: stats.attendanceToday,
+      icon: LogIn,
+      color: 'bg-emerald-500',
+      textColor: 'text-emerald-600',
+      bgLight: 'bg-emerald-50',
+    },
+    {
+      title: 'Currently Clocked In',
+      value: stats.currentlyClocked,
+      icon: CheckCircle,
+      color: 'bg-lime-500',
+      textColor: 'text-lime-600',
+      bgLight: 'bg-lime-50',
     },
   ];
 
@@ -365,6 +422,64 @@ const Analytics: React.FC = () => {
           <div className="bg-gradient-to-br from-purple-50 to-purple-100 p-4 rounded-lg">
             <p className="text-sm text-purple-800 font-medium mb-1">Total Staff Records</p>
             <p className="text-2xl font-bold text-purple-900">{stats.totalStaff}</p>
+          </div>
+        </div>
+      </div>
+
+      <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+        <div className="flex items-center gap-2 mb-4">
+          <Clock className="h-5 w-5 text-gray-600" />
+          <h3 className="text-lg font-semibold text-gray-900">Attendance Statistics</h3>
+        </div>
+        <div className="space-y-4">
+          <div className="flex items-center justify-between">
+            <span className="text-gray-600">Total Attendance Records</span>
+            <span className="font-semibold text-cyan-600">{stats.totalAttendance}</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-cyan-500 h-2 rounded-full"
+              style={{ width: '100%' }}
+            ></div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-gray-600">Attendance This Week</span>
+            <span className="font-semibold text-blue-600">{stats.attendanceThisWeek}</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-blue-500 h-2 rounded-full"
+              style={{
+                width: `${stats.totalAttendance > 0 ? (stats.attendanceThisWeek / stats.totalAttendance) * 100 : 0}%`,
+              }}
+            ></div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-gray-600">Attendance Today</span>
+            <span className="font-semibold text-emerald-600">{stats.attendanceToday}</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-emerald-500 h-2 rounded-full"
+              style={{
+                width: `${stats.attendanceThisWeek > 0 ? (stats.attendanceToday / stats.attendanceThisWeek) * 100 : 0}%`,
+              }}
+            ></div>
+          </div>
+
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-gray-600">Currently Clocked In</span>
+            <span className="font-semibold text-lime-600">{stats.currentlyClocked}</span>
+          </div>
+          <div className="w-full bg-gray-200 rounded-full h-2">
+            <div
+              className="bg-lime-500 h-2 rounded-full"
+              style={{
+                width: `${stats.attendanceToday > 0 ? (stats.currentlyClocked / stats.attendanceToday) * 100 : 0}%`,
+              }}
+            ></div>
           </div>
         </div>
       </div>
