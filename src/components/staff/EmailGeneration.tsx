@@ -193,7 +193,7 @@ const EmailGeneration: React.FC = () => {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-green-50 to-blue-50 py-12 px-4 sm:px-6 lg:px-8">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 to-green-50 py-12 px-4 sm:px-6 lg:px-8">
       <div className="max-w-3xl mx-auto">
         <div className="text-center mb-8">
           <div className="flex justify-center mb-4">
@@ -211,25 +211,25 @@ const EmailGeneration: React.FC = () => {
 
         {existingEmail ? (
           <div className="bg-white rounded-lg shadow-lg p-8">
-            <div className="bg-blue-50 border-l-4 border-blue-600 p-4 rounded">
+            <div className="bg-green-50 border-l-4 border-green-600 p-4 rounded">
               <div className="flex items-start">
-                <CheckCircle className="h-6 w-6 text-blue-600 mt-0.5 mr-3" />
+                <CheckCircle className="h-6 w-6 text-green-600 mt-0.5 mr-3" />
                 <div className="flex-1">
-                  <h3 className="text-lg font-medium text-blue-900 mb-2">
+                  <h3 className="text-lg font-medium text-green-900 mb-2">
                     Email Already Created
                   </h3>
-                  <p className="text-sm text-blue-700 mb-3">
+                  <p className="text-sm text-green-700 mb-3">
                     An email has already been created for this PSN
                   </p>
-                  <div className="bg-white p-3 rounded border border-blue-200">
-                    <p className="text-lg font-mono text-blue-900 break-all">
+                  <div className="bg-white p-3 rounded border border-green-200">
+                    <p className="text-lg font-mono text-green-900 break-all">
                       {existingEmail.email}
                     </p>
                   </div>
-                  <p className="text-sm text-blue-700 mt-3">
+                  <p className="text-sm text-green-700 mt-3">
                     Created on: {new Date(existingEmail.created_at).toLocaleDateString()}
                   </p>
-                  <p className="text-sm text-blue-700 mt-2">
+                  <p className="text-sm text-green-700 mt-2">
                     If you've forgotten your password, please contact IT support for assistance.
                   </p>
                 </div>

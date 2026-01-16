@@ -144,6 +144,7 @@ export default function ClockInOut() {
 
         if (updateError) throw updateError;
         toast.success('Successfully clocked out!');
+        console.log(activeRecord.id);
       }
 
       setStep('success');
@@ -168,10 +169,10 @@ export default function ClockInOut() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-green-50 py-12 px-4">
+    <div className="min-h-screen bg-gradient-to-br from-green-50 via-white to-green-50 py-12 px-4">
       <div className="max-w-2xl mx-auto">
         <div className="text-center mb-8">
-          <div className="inline-flex items-center justify-center w-20 h-20 bg-blue-600 rounded-full mb-4">
+          <div className="inline-flex items-center justify-center w-20 h-20 bg-green-600 rounded-full mb-4">
             <Clock className="w-10 h-10 text-white" />
           </div>
           <h1 className="text-4xl font-bold text-gray-900 mb-2">Staff Attendance</h1>
@@ -191,7 +192,7 @@ export default function ClockInOut() {
                   type="text"
                   value={psn}
                   onChange={(e) => setPsn(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="Enter your PSN"
                 />
               </div>
@@ -203,7 +204,7 @@ export default function ClockInOut() {
                 <select
                   value={gender}
                   onChange={(e) => setGender(e.target.value)}
-                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                 >
                   <option value="">Select Gender</option>
                   <option value="Male">Male</option>
@@ -214,7 +215,7 @@ export default function ClockInOut() {
               <button
                 onClick={handleVerifyStaff}
                 disabled={loading}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
               >
                 {loading ? 'Verifying...' : 'Verify & Continue'}
               </button>
@@ -315,7 +316,7 @@ export default function ClockInOut() {
                   value={approvalCode}
                   onChange={(e) => setApprovalCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
                   maxLength={6}
-                  className="w-full px-4 py-4 text-center text-2xl font-mono tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+                  className="w-full px-4 py-4 text-center text-2xl font-mono tracking-widest border border-gray-300 rounded-lg focus:ring-2 focus:ring-green-500 focus:border-transparent"
                   placeholder="000000"
                 />
               </div>
@@ -323,7 +324,7 @@ export default function ClockInOut() {
               <button
                 onClick={handleSubmitCode}
                 disabled={loading || approvalCode.length !== 6}
-                className="w-full bg-blue-600 text-white py-3 rounded-lg font-semibold hover:bg-blue-700 transition-colors disabled:opacity-50"
+                className="w-full bg-green-600 text-white py-3 rounded-lg font-semibold hover:bg-green-700 transition-colors disabled:opacity-50"
               >
                 {loading ? 'Processing...' : 'Submit'}
               </button>
