@@ -144,7 +144,6 @@ export default function ClockInOut() {
 
         if (updateError) throw updateError;
         toast.success('Successfully clocked out!');
-        console.log(activeRecord.id);
       }
 
       setStep('success');

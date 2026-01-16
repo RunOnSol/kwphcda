@@ -83,7 +83,7 @@ const Navbar = () => {
           >
             Staff Email
           </button>
-           <button
+          <button
             onClick={() => navigate('/attendance')}
             className="text-green-800 hover:text-green-600 font-medium transition-colors"
           >
@@ -133,8 +133,7 @@ const Navbar = () => {
               Staff Email
             </button>
 
-            
-            <button
+              <button
               onClick={() => {
                 navigate('/attendance');
                 setIsMenuOpen(false);

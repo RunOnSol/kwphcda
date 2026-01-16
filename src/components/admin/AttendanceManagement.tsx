@@ -84,7 +84,16 @@ export default function AttendanceManagement() {
     setFilteredRecords(filtered);
   };
 
+  const canGenerateApprovalCode = () => {
+    return user?.role && ['super_admin', 'admin', 'manager'].includes(user.role);
+  };
+
   const generateApprovalCode = async () => {
+    if (!canGenerateApprovalCode()) {
+      toast.error('Only admins and managers can generate approval codes');
+      return;
+    }
+
     setGeneratingCode(true);
     try {
       await supabase
@@ -192,42 +201,44 @@ export default function AttendanceManagement() {
         </button>
       </div>
 
-      <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-8 text-white">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-2xl font-bold mb-2">Approval Code Generator</h2>
-            <p className="text-blue-100">Generate a 6-digit code for staff attendance approval</p>
+      {canGenerateApprovalCode() && (
+        <div className="bg-gradient-to-br from-blue-500 to-blue-700 rounded-xl p-8 text-white">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold mb-2">Approval Code Generator</h2>
+              <p className="text-blue-100">Generate a 6-digit code for staff attendance approval</p>
+            </div>
+            <Key className="w-12 h-12 text-blue-200" />
           </div>
-          <Key className="w-12 h-12 text-blue-200" />
-        </div>
 
-        {approvalCode ? (
-          <div className="bg-white rounded-lg p-6 text-center">
-            <div className="text-5xl font-bold text-blue-600 tracking-widest mb-3">
-              {approvalCode}
+          {approvalCode ? (
+            <div className="bg-white rounded-lg p-6 text-center">
+              <div className="text-5xl font-bold text-blue-600 tracking-widest mb-3">
+                {approvalCode}
+              </div>
+              <div className="text-gray-600 text-sm">
+                Expires in {codeExpiry ? Math.max(0, Math.ceil((codeExpiry.getTime() - Date.now()) / 1000)) : 0}s
+              </div>
+              <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
+                <div
+                  className="h-full bg-blue-600 transition-all duration-1000"
+                  style={{
+                    width: codeExpiry ? `${Math.max(0, ((codeExpiry.getTime() - Date.now()) / 30000) * 100)}%` : '0%'
+                  }}
+                />
+              </div>
             </div>
-            <div className="text-gray-600 text-sm">
-              Expires in {codeExpiry ? Math.max(0, Math.ceil((codeExpiry.getTime() - Date.now()) / 1000)) : 0}s
-            </div>
-            <div className="mt-4 h-2 bg-gray-200 rounded-full overflow-hidden">
-              <div
-                className="h-full bg-blue-600 transition-all duration-1000"
-                style={{
-                  width: codeExpiry ? `${Math.max(0, ((codeExpiry.getTime() - Date.now()) / 30000) * 100)}%` : '0%'
-                }}
-              />
-            </div>
-          </div>
-        ) : (
-          <button
-            onClick={generateApprovalCode}
-            disabled={generatingCode}
-            className="w-full bg-white text-blue-600 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
-          >
-            {generatingCode ? 'Generating...' : 'Generate New Code'}
-          </button>
-        )}
-      </div>
+          ) : (
+            <button
+              onClick={generateApprovalCode}
+              disabled={generatingCode}
+              className="w-full bg-white text-blue-600 py-4 rounded-lg font-semibold hover:bg-blue-50 transition-colors disabled:opacity-50"
+            >
+              {generatingCode ? 'Generating...' : 'Generate New Code'}
+            </button>
+          )}
+        </div>
+      )}
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
         <div className="bg-white rounded-lg shadow p-6">

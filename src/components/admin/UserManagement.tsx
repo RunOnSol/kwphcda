@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
-import { getAllUsers, updateUserProfile } from '../../lib/supabase';
+import { getAllUsers, updateUserProfile, supabase } from '../../lib/supabase';
 import { User, USER_ROLES } from '../../types';
 import { useAuth } from '../../context/AuthContext';
-import { Check, X, Edit, Search, Filter } from 'lucide-react';
+import { Check, X, Edit, Search, Filter, Link as LinkIcon, Copy, Shield } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { logActivity } from '../../lib/activityLogger';
 
@@ -13,9 +13,14 @@ const UserManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [statusFilter, setStatusFilter] = useState('all');
   const [roleFilter, setRoleFilter] = useState('all');
+  const [isPublicSignup, setIsPublicSignup] = useState(false);
+  const [loadingSettings, setLoadingSettings] = useState(false);
+  const [invitationLink, setInvitationLink] = useState('');
+  const [generatingLink, setGeneratingLink] = useState(false);
 
   useEffect(() => {
     fetchUsers();
+    fetchSignupSettings();
   }, []);
 
   const fetchUsers = async () => {
@@ -29,6 +34,90 @@ const UserManagement: React.FC = () => {
     } finally {
       setLoading(false);
     }
+  };
+
+  const fetchSignupSettings = async () => {
+    try {
+      const { data, error } = await supabase
+        .from('signup_settings')
+        .select('is_public')
+        .maybeSingle();
+
+      if (error) throw error;
+      if (data) {
+        setIsPublicSignup(data.is_public);
+      }
+    } catch (error) {
+      console.error('Error fetching signup settings:', error);
+    }
+  };
+
+  const toggleSignupAccess = async () => {
+    setLoadingSettings(true);
+    try {
+      const { error } = await supabase
+        .from('signup_settings')
+        .update({
+          is_public: !isPublicSignup,
+          updated_by: currentUser?.id,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', (await supabase.from('signup_settings').select('id').single()).data?.id);
+
+      if (error) throw error;
+
+      setIsPublicSignup(!isPublicSignup);
+      toast.success(`Signup is now ${!isPublicSignup ? 'public' : 'private'}`);
+
+      logActivity('signup_toggle', `Signup access changed to ${!isPublicSignup ? 'public' : 'private'}`, {
+        new_status: !isPublicSignup ? 'public' : 'private',
+      });
+    } catch (error) {
+      console.error('Error updating signup settings:', error);
+      toast.error('Failed to update signup settings');
+    } finally {
+      setLoadingSettings(false);
+    }
+  };
+
+  const generateInvitationLink = async () => {
+    setGeneratingLink(true);
+    try {
+      const token = Math.random().toString(36).substring(2) + Math.random().toString(36).substring(2);
+      const expiresAt = new Date();
+      expiresAt.setDate(expiresAt.getDate() + 7);
+
+      const { error } = await supabase
+        .from('signup_invitations')
+        .insert({
+          token,
+          created_by: currentUser?.id,
+          expires_at: expiresAt.toISOString(),
+          max_uses: 1,
+          is_active: true,
+        });
+
+      if (error) throw error;
+
+      const link = `${window.location.origin}/signup?invite=${token}`;
+      setInvitationLink(link);
+      toast.success('Invitation link generated!');
+
+      logActivity('invitation_create', 'Created new signup invitation link', {
+        token,
+        expires_at: expiresAt.toISOString(),
+      });
+    } catch (error) {
+      console.error('Error generating invitation link:', error);
+      toast.error('Failed to generate invitation link');
+    } finally {
+      setGeneratingLink(false);
+    }
+  };
+
+  const copyInvitationLink = () => {
+    navigator.clipboard.writeText(invitationLink);
+    toast.success('Link copied to clipboard!');
   };
 
   const handleApproveUser = async (userId: string) => {
@@ -151,8 +240,91 @@ const UserManagement: React.FC = () => {
     );
   }
 
+  const canManageSignupSettings = () => {
+    return currentUser?.role && ['super_admin', 'admin'].includes(currentUser.role);
+  };
+
   return (
     <div className="space-y-6">
+      {/* Signup Settings - Only for super_admin and admin */}
+      {canManageSignupSettings() && (
+        <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
+          <h3 className="text-lg font-semibold text-gray-900 mb-4 flex items-center gap-2">
+            <Shield className="h-5 w-5 text-green-600" />
+            Signup Access Control
+          </h3>
+
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div className="border border-gray-200 rounded-lg p-4">
+              <div className="flex items-center justify-between mb-2">
+                <div>
+                  <h4 className="font-medium text-gray-900">Public Signup</h4>
+                  <p className="text-sm text-gray-600">Allow anyone to create an account</p>
+                </div>
+                <button
+                  onClick={toggleSignupAccess}
+                  disabled={loadingSettings}
+                  className={`relative inline-flex h-6 w-11 items-center rounded-full transition-colors ${
+                    isPublicSignup ? 'bg-green-600' : 'bg-gray-300'
+                  } ${loadingSettings ? 'opacity-50' : ''}`}
+                >
+                  <span
+                    className={`inline-block h-4 w-4 transform rounded-full bg-white transition-transform ${
+                      isPublicSignup ? 'translate-x-6' : 'translate-x-1'
+                    }`}
+                  />
+                </button>
+              </div>
+              <p className="text-xs text-gray-500 mt-2">
+                Status: <span className="font-semibold">{isPublicSignup ? 'Public' : 'Private'}</span>
+              </p>
+            </div>
+
+            <div className="border border-gray-200 rounded-lg p-4">
+              <h4 className="font-medium text-gray-900 mb-2 flex items-center gap-2">
+                <LinkIcon className="h-4 w-4 text-green-600" />
+                Generate Invitation Link
+              </h4>
+              <p className="text-sm text-gray-600 mb-3">Create a one-time signup link valid for 7 days</p>
+
+              {invitationLink ? (
+                <div className="space-y-2">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      value={invitationLink}
+                      readOnly
+                      className="flex-1 px-3 py-2 border border-gray-300 rounded-md bg-gray-50 text-sm"
+                    />
+                    <button
+                      onClick={copyInvitationLink}
+                      className="px-3 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors"
+                      title="Copy link"
+                    >
+                      <Copy className="h-4 w-4" />
+                    </button>
+                  </div>
+                  <button
+                    onClick={() => setInvitationLink('')}
+                    className="text-sm text-gray-600 hover:text-gray-900"
+                  >
+                    Generate new link
+                  </button>
+                </div>
+              ) : (
+                <button
+                  onClick={generateInvitationLink}
+                  disabled={generatingLink}
+                  className="w-full px-4 py-2 bg-green-600 text-white rounded-md hover:bg-green-700 transition-colors disabled:opacity-50"
+                >
+                  {generatingLink ? 'Generating...' : 'Generate Link'}
+                </button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Filters */}
       <div className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
         <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

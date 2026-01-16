@@ -93,7 +93,6 @@ const StaffManagement: React.FC = () => {
     let filtered = staff.filter((member) => {
       const matchesSearch =
         member.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        member.sn.toLowerCase().includes(searchTerm.toLowerCase()) ||
         (member.psn &&
           member.psn.toLowerCase().includes(searchTerm.toLowerCase()));
 
