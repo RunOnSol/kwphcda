@@ -69,7 +69,7 @@ const UserManagement: React.FC = () => {
       setIsPublicSignup(!isPublicSignup);
       toast.success(`Signup is now ${!isPublicSignup ? 'public' : 'private'}`);
 
-      logActivity('signup_toggle', `Signup access changed to ${!isPublicSignup ? 'public' : 'private'}`, {
+      logActivity('signup_toggle' as any, `Signup access changed to ${!isPublicSignup ? 'public' : 'private'}`, {
         new_status: !isPublicSignup ? 'public' : 'private',
       });
     } catch (error) {
@@ -103,7 +103,7 @@ const UserManagement: React.FC = () => {
       setInvitationLink(link);
       toast.success('Invitation link generated!');
 
-      logActivity('invitation_create', 'Created new signup invitation link', {
+      logActivity('invitation_create' as any, 'Created new signup invitation link', {
         token,
         expires_at: expiresAt.toISOString(),
       });
