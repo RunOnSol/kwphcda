@@ -230,7 +230,7 @@ const EmailGeneration: React.FC = () => {
                     Created on: {new Date(existingEmail.created_at).toLocaleDateString()}
                   </p>
                   <p className="text-sm text-green-700 mt-2">
-                    If you've forgotten your password, please contact IT support for assistance.
+                    If you've forgotten your password, please contact IT support for assistance ASAP.
                   </p>
                 </div>
               </div>
