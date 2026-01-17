@@ -88,7 +88,7 @@ const ProgrammeModal = () => {
     <div className="space-y-6">
       <div className="prose max-w-none">
         <p>
-          KWPHCDA implements various programs aimed at improving health outcomes across different population groups in Kwara State. These programs are designed to address specific health challenges and are implemented in collaboration with various partners.
+          KWSPHCDA implements various programs aimed at improving health outcomes across different population groups in Kwara State. These programs are designed to address specific health challenges and are implemented in collaboration with various partners.
         </p>
       </div>
       
@@ -133,7 +133,7 @@ const ProgrammeModal = () => {
       <div className="bg-green-50 p-6 rounded-lg">
         <h3 className="text-xl font-semibold text-green-700 mb-4">Our Implementation Approach</h3>
         <p className="mb-4">
-          KWPHCDA adopts a collaborative and integrated approach to program implementation, working closely with various stakeholders including:
+          KWSPHCDA adopts a collaborative and integrated approach to program implementation, working closely with various stakeholders including:
         </p>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4">

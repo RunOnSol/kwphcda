@@ -56,7 +56,7 @@ const StaffManagement: React.FC = () => {
     qualification: "",
     rank: "",
     cadre: "",
-    parent_mda: "KWPHCDA",
+    parent_mda: "KWSPHCDA",
     present_posting: "",
     mobile_number: "",
     tier: "",
@@ -189,7 +189,7 @@ const StaffManagement: React.FC = () => {
       qualification: member.qualification || "",
       rank: member.rank || "",
       cadre: member.cadre || "",
-      parent_mda: member.parent_mda || "KWPHCDA",
+      parent_mda: member.parent_mda || "KWSPHCDA",
       present_posting: member.present_posting || "",
       mobile_number: member.mobile_number || "",
       tier: member.tier || "",
@@ -226,7 +226,7 @@ const StaffManagement: React.FC = () => {
       qualification: "",
       rank: "",
       cadre: "",
-      parent_mda: "KWPHCDA",
+      parent_mda: "KWSPHCDA",
       present_posting: "",
       mobile_number: "",
       tier: "",
@@ -256,7 +256,7 @@ const StaffManagement: React.FC = () => {
     const doc = new jsPDF("l", "mm", "a4");
 
     doc.setFontSize(16);
-    doc.text("KWPHCDA Staff List", 14, 15);
+    doc.text("KWSPHCDA Staff List", 14, 15);
     doc.setFontSize(10);
     doc.text(`Generated on: ${new Date().toLocaleDateString()}`, 14, 25);
     doc.text(`Total Staff: ${filteredStaff.length}`, 14, 30);
@@ -295,7 +295,7 @@ const StaffManagement: React.FC = () => {
       headStyles: { fillColor: [34, 197, 94] },
     });
 
-    doc.save("kwphcda-staff-list.pdf");
+    doc.save("KWSPHCDA-staff-list.pdf");
     toast.success("PDF exported successfully");
   };
 
@@ -330,7 +330,7 @@ const StaffManagement: React.FC = () => {
     const data = new Blob([excelBuffer], {
       type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
     });
-    saveAs(data, "kwphcda-staff-list.xlsx");
+    saveAs(data, "KWSPHCDA-staff-list.xlsx");
     toast.success("Excel file exported successfully");
   };
 
@@ -360,7 +360,7 @@ const StaffManagement: React.FC = () => {
     const ws = XLSX.utils.json_to_sheet(exportData);
     const csvOutput = XLSX.utils.sheet_to_csv(ws);
     const data = new Blob([csvOutput], { type: "text/csv;charset=utf-8;" });
-    saveAs(data, "kwphcda-staff-list.csv");
+    saveAs(data, "KWSPHCDA-staff-list.csv");
     toast.success("CSV file exported successfully");
   };
 
@@ -378,7 +378,7 @@ const StaffManagement: React.FC = () => {
       <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
         <div>
           <h2 className="text-2xl font-bold text-gray-900">Staff Management</h2>
-          <p className="text-gray-600">Manage KWPHCDA staff records</p>
+          <p className="text-gray-600">Manage KWSPHCDA staff records</p>
         </div>
 
         <div className="flex flex-wrap gap-2">

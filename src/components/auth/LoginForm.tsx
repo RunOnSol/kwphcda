@@ -52,7 +52,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onToggleForm }) => {
             <LogIn className="h-8 w-8 text-white" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Sign in to KWPHCDA
+            Sign in to KWSPHCDA
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Access your healthcare management dashboard

@@ -4,9 +4,9 @@ const AboutModal = () => {
   return (
     <div className="space-y-6">
       <div className="prose max-w-none">
-        <h3 className="text-xl font-semibold text-green-700">About KWPHCDA</h3>
+        <h3 className="text-xl font-semibold text-green-700">About KWSPHCDA</h3>
         <p>
-          The Kwara State Primary Health Care Development Agency (KWPHCDA) was
+          The Kwara State Primary Health Care Development Agency (KWSPHCDA) was
           established in 2009 to coordinate and implement primary healthcare
           programs and services across the state. Our mandate is to ensure that
           quality primary healthcare services are accessible to all residents of
@@ -15,7 +15,7 @@ const AboutModal = () => {
 
         <p>
           Working under the guidance of the State Ministry of Health and in
-          collaboration with various local and international partners, KWPHCDA
+          collaboration with various local and international partners, KWSPHCDA
           has been at the forefront of healthcare delivery in the state,
           implementing numerous initiatives aimed at improving health outcomes
           and reducing mortality rates.

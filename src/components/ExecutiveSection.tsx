@@ -24,7 +24,7 @@ const ExecutiveSection = () => {
               Prof. Nusirat Elelu
             </h3>
             <p className="text-sm text-green-600 mb-4">
-              Executive Secretary, KWPHCDA
+              Executive Secretary, KWSPHCDA
             </p>
             <div className="prose text-gray-700">
               <p className="mb-4">
@@ -37,7 +37,7 @@ const ExecutiveSection = () => {
                 health in Africa.
               </p>
               <p className="mb-4">
-                Under her leadership, KWPHCDA has achieved significant
+                Under her leadership, KWSPHCDA has achieved significant
                 milestones in expanding access to essential health services,
                 improving maternal and child health outcomes, and strengthening
                 healthcare infrastructure in rural communities.

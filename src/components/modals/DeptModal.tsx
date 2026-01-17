@@ -80,7 +80,7 @@ const DeptModal = () => {
     <div className="space-y-6">
       <div className="prose max-w-none">
         <p>
-          KWPHCDA operates through specialized departments, each focused on specific aspects of primary healthcare delivery. These departments work collaboratively to ensure comprehensive healthcare services across the state.
+          KWSPHCDA operates through specialized departments, each focused on specific aspects of primary healthcare delivery. These departments work collaboratively to ensure comprehensive healthcare services across the state.
         </p>
       </div>
       

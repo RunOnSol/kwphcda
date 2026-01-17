@@ -8,7 +8,7 @@ const Settings: React.FC = () => {
   const [saving, setSaving] = useState(false);
   const [settings, setSettings] = useState({
     siteName: 'Kwara PHC System',
-    supportEmail: 'support@kwphcda.gov.ng',
+    supportEmail: 'support@kwsphcda.gov.ng',
     emailNotifications: true,
     systemNotifications: true,
     maintenanceMode: false,
@@ -19,7 +19,7 @@ const Settings: React.FC = () => {
   const [cpanelConfig, setCpanelConfig] = useState({
     host: '',
     username: '',
-    domain: 'kwphcda.gov.ng',
+    domain: 'KWSPHCDA.gov.ng',
     quota: '250',
   });
 
@@ -277,7 +277,7 @@ const Settings: React.FC = () => {
                 value={cpanelConfig.host}
                 onChange={(e) => handleCpanelChange('host', e.target.value)}
                 disabled={!isSuperAdmin}
-                placeholder="mail.kwphcda.gov.ng"
+                placeholder="mail.KWSPHCDA.gov.ng"
                 className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500 disabled:bg-gray-100"
               />
             </div>

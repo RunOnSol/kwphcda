@@ -65,7 +65,7 @@ const FacilitiesModal = () => {
     <div className="space-y-6">
       <div className="prose max-w-none">
         <p>
-          KWPHCDA manages a network of primary healthcare facilities across all 16 local government areas of Kwara State. These facilities serve as the first point of contact for healthcare services in their communities.
+          KWSPHCDA manages a network of primary healthcare facilities across all 16 local government areas of Kwara State. These facilities serve as the first point of contact for healthcare services in their communities.
         </p>
       </div>
       
@@ -130,7 +130,7 @@ const FacilitiesModal = () => {
       <div className="bg-green-50 p-6 rounded-lg">
         <h3 className="text-xl font-semibold text-green-700 mb-4">PHC Facility Distribution</h3>
         <p className="mb-4">
-          KWPHCDA has established a network of over 500 primary healthcare facilities across all 16 local government areas of Kwara State, ensuring that healthcare services are accessible to all residents, regardless of their location.
+          KWSPHCDA has established a network of over 500 primary healthcare facilities across all 16 local government areas of Kwara State, ensuring that healthcare services are accessible to all residents, regardless of their location.
         </p>
         
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">

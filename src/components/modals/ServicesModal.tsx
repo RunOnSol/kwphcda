@@ -82,7 +82,7 @@ const ServicesModal = () => {
     <div className="space-y-6">
       <div className="prose max-w-none">
         <p>
-          KWPHCDA provides a comprehensive range of primary healthcare services through its network of facilities across the state. These services are designed to address the basic health needs of communities and serve as the first point of contact with the healthcare system.
+          KWSPHCDA provides a comprehensive range of primary healthcare services through its network of facilities across the state. These services are designed to address the basic health needs of communities and serve as the first point of contact with the healthcare system.
         </p>
       </div>
       
@@ -115,7 +115,7 @@ const ServicesModal = () => {
       <div className="bg-green-50 p-6 rounded-lg">
         <h3 className="text-xl font-semibold text-green-700 mb-4">Our Service Approach</h3>
         <p className="mb-4">
-          KWPHCDA adopts an integrated approach to service delivery, ensuring that all essential services are available at every primary healthcare facility. This comprehensive approach ensures that communities receive the full range of services they need without having to travel long distances.
+          KWSPHCDA adopts an integrated approach to service delivery, ensuring that all essential services are available at every primary healthcare facility. This comprehensive approach ensures that communities receive the full range of services they need without having to travel long distances.
         </p>
         
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">

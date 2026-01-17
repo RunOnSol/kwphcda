@@ -43,7 +43,7 @@ const ModalContainer = () => {
       >
         <div className="p-4 border-b border-gray-200 flex justify-between items-center sticky top-0 bg-white z-10">
           <h2 className="text-2xl font-bold text-green-800 capitalize">
-            {activeModal === 'home' ? 'Welcome to KWPHCDA' : activeModal}
+            {activeModal === 'home' ? 'Welcome to KWSPHCDA' : activeModal}
           </h2>
           <button 
             onClick={closeModal}

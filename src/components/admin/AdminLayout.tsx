@@ -109,7 +109,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
           <div className="flex items-center">
             <Shield className="h-8 w-8 text-green-600" />
             <span className="ml-2 text-xl font-bold text-gray-900">
-              KWPHCDA
+              KWSPHCDA
             </span>
           </div>
           <button

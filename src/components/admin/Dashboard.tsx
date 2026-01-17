@@ -176,7 +176,7 @@ const Dashboard: React.FC = () => {
     <div className="space-y-6">
       {/* Welcome Section */}
       <div className="bg-gradient-to-r from-green-600 to-green-700 rounded-lg p-6 text-white">
-        <h2 className="text-2xl font-bold mb-2">Welcome to KWPHCDA Admin Dashboard</h2>
+        <h2 className="text-2xl font-bold mb-2">Welcome to KWSPHCDA Admin Dashboard</h2>
         <p className="text-green-100">
           Manage users, PHC facilities, and content for Kwara State Primary Health Care Development Agency
         </p>

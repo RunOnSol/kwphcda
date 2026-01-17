@@ -11,7 +11,7 @@ const LoadingSpinner: React.FC = () => {
             <Activity className="h-6 w-6 text-green-600" />
           </div>
         </div>
-        <h2 className="mt-4 text-lg font-semibold text-gray-900">KWPHCDA</h2>
+        <h2 className="mt-4 text-lg font-semibold text-gray-900">KWSPHCDA</h2>
         <p className="mt-2 text-sm text-gray-600">Loading your dashboard...</p>
       </div>
     </div>

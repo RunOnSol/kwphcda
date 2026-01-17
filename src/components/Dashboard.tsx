@@ -47,7 +47,7 @@ const Dashboard: React.FC = () => {
               <Activity className="h-8 w-8 text-green-600 mr-3" />
               <div>
                 <h1 className="text-xl font-bold text-gray-900">
-                  KWPHCDA Dashboard
+                  KWSPHCDA Dashboard
                 </h1>
                 <p className="text-sm text-gray-500">
                   Kwara State Primary Health Care Development Agency
@@ -130,7 +130,7 @@ const Dashboard: React.FC = () => {
                 Welcome back, {user?.full_name}!
               </h2>
               <p className="text-green-100">
-                Access your KWPHCDA dashboard and manage your healthcare
+                Access your KWSPHCDA dashboard and manage your healthcare
                 services.
               </p>
             </div>

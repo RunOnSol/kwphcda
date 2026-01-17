@@ -139,7 +139,7 @@ const BlogPost: React.FC = () => {
             <div className="mt-12 pt-8 border-t border-gray-200">
               <div className="flex items-center justify-between">
                 <div className="text-sm text-gray-500">
-                  Published by KWPHCDA
+                  Published by KWSPHCDA
                 </div>
                 <button
                   onClick={() => navigate('/')}

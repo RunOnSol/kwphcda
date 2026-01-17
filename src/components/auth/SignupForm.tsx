@@ -106,7 +106,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ onToggleForm }) => {
             <UserPlus className="h-8 w-8 text-white" />
           </div>
           <h2 className="mt-6 text-3xl font-bold text-gray-900">
-            Join KWPHCDA
+            Join KWSPHCDA
           </h2>
           <p className="mt-2 text-sm text-gray-600">
             Create your account to access healthcare services

@@ -84,7 +84,7 @@ const EmailGeneration: React.FC = () => {
       const lastName = nameParts[nameParts.length - 1] || '';
       const emailPrefix = `${firstName}.${lastName}`;
       const cleanedPrefix = emailPrefix.replace(/[^a-z.]/g, '');
-      const suggestedEmail = `${cleanedPrefix}@kwsphcda.gov.ng`;
+      const suggestedEmail = `${cleanedPrefix}@KWSPHCDA.gov.ng`;
 
       setEmail(suggestedEmail);
     } catch (error) {
@@ -121,9 +121,9 @@ const EmailGeneration: React.FC = () => {
     if (!staffData) return;
 
     // Validate email format
-    const emailRegex = /^[a-z][a-z0-9._-]*@kwphcda\.gov\.ng$/;
+    const emailRegex = /^[a-z][a-z0-9._-]*@KWSPHCDA\.gov\.ng$/;
     if (!emailRegex.test(email)) {
-      toast.error('Invalid email format. Email must be in format: name@kwphcda.gov.ng');
+      toast.error('Invalid email format. Email must be in format: name@KWSPHCDA.gov.ng');
       return;
     }
 
