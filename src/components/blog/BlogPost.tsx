@@ -69,7 +69,7 @@ const BlogPost: React.FC = () => {
       <header className="bg-white shadow-sm">
         <div className="container mx-auto px-4 py-4">
           <button
-            onClick={() => navigate('/')}
+            onClick={() => navigate('/#blogsec')}
             className="inline-flex items-center text-green-600 hover:text-green-700 font-medium"
           >
             <ArrowLeft className="h-5 w-5 mr-2" />
@@ -83,11 +83,11 @@ const BlogPost: React.FC = () => {
         <div className="bg-white rounded-lg shadow-sm overflow-hidden">
           {/* Featured Image */}
           {post.image_url && (
-            <div className="h-64 md:h-96 overflow-hidden">
+            <div className="h-full md:h-full overflow-hidden">
               <img
                 src={post.image_url}
                 alt={post.title}
-                className="w-full h-full object-cover"
+                className="w-full h-full object-fill"
               />
             </div>
           )}

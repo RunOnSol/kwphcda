@@ -13,9 +13,9 @@ const Logo = () => {
       </div> */}
       <div>
         <span className="font-bold text-green-800 text-xl">KWSPHCDA</span>
-        <p className="text-xs text-green-700 hidden sm:block">
+        {/* <p className="text-xs text-green-700 hidden sm:block">
           Kwara State Primary Health Care Development Agency
-        </p>
+        </p> */}
       </div>
     </div>
   );

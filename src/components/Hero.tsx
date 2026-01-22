@@ -29,7 +29,7 @@ const slides = [
     description:
       "Comprehensive healthcare solutions for children from birth through adolescence.",
     imageUrl:
-      "https://images.pexels.com/photos/4386466/pexels-photo-4386466.jpeg",
+      "http://kwphcda.com.ng/image/2.jpg",
   },
   {
     id: 5,
@@ -37,7 +37,7 @@ const slides = [
     description:
       "Our dedicated professionals bringing healthcare to every doorstep.",
     imageUrl:
-      "https://images.pexels.com/photos/5214953/pexels-photo-5214953.jpeg",
+      "http://kwphcda.com.ng/image/1.jpg",
   },
   {
     id: 6,
@@ -45,7 +45,7 @@ const slides = [
     description:
       "Proactive measures to prevent communicable and non-communicable diseases.",
     imageUrl:
-      "https://images.pexels.com/photos/7089401/pexels-photo-7089401.jpeg",
+      "http://kwphcda.com.ng/image/post1.jpg",
   },
   {
     id: 7,
@@ -53,7 +53,7 @@ const slides = [
     description:
       "Making primary healthcare accessible to all residents of Kwara State.",
     imageUrl:
-      "https://images.pexels.com/photos/4173239/pexels-photo-4173239.jpeg",
+      "http://kwphcda.com.ng/image/post1.jpg",
   },
 ];
 
@@ -69,7 +69,7 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative h-screen overflow-hidden">
+    <section className="relative h-screen overflow-hidden mt-3">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div
@@ -85,7 +85,7 @@ const Hero = () => {
           <img
             src={slide.imageUrl}
             alt={slide.title}
-            className="w-full h-full object-cover"
+            className="w-full h-full object-center"
           />
           <div className="absolute inset-0 z-20 flex items-center justify-center">
             <div className="text-center text-white max-w-3xl px-4">

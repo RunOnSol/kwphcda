@@ -20,6 +20,11 @@ const LandingPage: React.FC = () => {
       <div className="min-h-screen bg-white flex flex-col">
         <Navbar />
         <main className="flex-grow">
+          <br />
+          <br />
+          <br />
+     
+
           <Hero />
           <ExecutiveSection />
           <BlogSection />

@@ -52,8 +52,8 @@ const BlogSection = () => {
   }
 
   return (
-    <section className="py-16 px-4">
-      <div className="container mx-auto">
+    <section className="py-16 px-4" >
+      <div className="container mx-auto" id="blogsec">
         <h2 className="text-3xl font-bold text-green-800 text-center mb-12">
           Latest News & Updates
         </h2>
