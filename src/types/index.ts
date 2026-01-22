@@ -31,6 +31,7 @@ export interface PHC {
   services: string[];
   staff_count: number;
   status: "active" | "inactive";
+  image_url?: string;
   created_at: string;
   updated_at: string;
 }

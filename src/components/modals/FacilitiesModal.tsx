@@ -1,65 +1,45 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Search } from 'lucide-react';
-
-const facilities = [
-  {
-    id: 1,
-    name: 'Ilorin Central PHC',
-    location: 'Ilorin East LGA',
-    services: ['Immunization', 'Maternal Care', 'Child Health', 'Family Planning'],
-    staffCount: 15,
-    imageUrl: 'https://images.pexels.com/photos/668300/pexels-photo-668300.jpeg',
-  },
-  {
-    id: 2,
-    name: 'Offa Township PHC',
-    location: 'Offa LGA',
-    services: ['Immunization', 'Maternal Care', 'Child Health', 'Laboratory Services'],
-    staffCount: 12,
-    imageUrl: 'https://images.pexels.com/photos/247786/pexels-photo-247786.jpeg',
-  },
-  {
-    id: 3,
-    name: 'Lafiagi Community PHC',
-    location: 'Edu LGA',
-    services: ['Immunization', 'Maternal Care', 'Disease Control', 'Nutrition'],
-    staffCount: 10,
-    imageUrl: 'https://images.pexels.com/photos/127873/pexels-photo-127873.jpeg',
-  },
-  {
-    id: 4,
-    name: 'Omu-Aran Health Center',
-    location: 'Irepodun LGA',
-    services: ['Immunization', 'Maternal Care', 'Child Health', 'Health Education'],
-    staffCount: 14,
-    imageUrl: 'https://images.pexels.com/photos/236380/pexels-photo-236380.jpeg',
-  },
-  {
-    id: 5,
-    name: 'Patigi PHC',
-    location: 'Patigi LGA',
-    services: ['Immunization', 'Maternal Care', 'Family Planning', 'Disease Control'],
-    staffCount: 11,
-    imageUrl: 'https://images.pexels.com/photos/263402/pexels-photo-263402.jpeg',
-  },
-  {
-    id: 6,
-    name: 'Kaiama Health Center',
-    location: 'Kaiama LGA',
-    services: ['Immunization', 'Maternal Care', 'Child Health', 'Nutrition'],
-    staffCount: 9,
-    imageUrl: 'https://images.pexels.com/photos/1692693/pexels-photo-1692693.jpeg',
-  },
-];
+import { getAllPHCs } from '../../lib/supabase';
+import { PHC } from '../../types';
+import toast from 'react-hot-toast';
 
 const FacilitiesModal = () => {
   const [searchTerm, setSearchTerm] = useState('');
-  
-  const filteredFacilities = facilities.filter(facility => 
+  const [phcs, setPHCs] = useState<PHC[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    fetchPHCs();
+  }, []);
+
+  const fetchPHCs = async () => {
+    try {
+      const { data, error } = await getAllPHCs();
+      if (error) throw error;
+      setPHCs(data || []);
+    } catch (error) {
+      console.error('Error fetching PHCs:', error);
+      toast.error('Failed to load facilities');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const filteredFacilities = phcs.filter(facility =>
     facility.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    facility.location.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    facility.lga.toLowerCase().includes(searchTerm.toLowerCase()) ||
+    facility.ward.toLowerCase().includes(searchTerm.toLowerCase()) ||
     facility.services.some(service => service.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-64">
+        <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-green-600"></div>
+      </div>
+    );
+  }
 
   return (
     <div className="space-y-6">
@@ -68,7 +48,7 @@ const FacilitiesModal = () => {
           KWSPHCDA manages a network of primary healthcare facilities across all 16 local government areas of Kwara State. These facilities serve as the first point of contact for healthcare services in their communities.
         </p>
       </div>
-      
+
       <div className="relative">
         <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
           <Search size={18} className="text-gray-400" />
@@ -81,40 +61,49 @@ const FacilitiesModal = () => {
           onChange={(e) => setSearchTerm(e.target.value)}
         />
       </div>
-      
+
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         {filteredFacilities.map((facility) => (
           <div key={facility.id} className="border border-gray-200 rounded-lg overflow-hidden shadow-sm hover:shadow-md transition-shadow">
-            <div className="h-40 overflow-hidden">
-              <img 
-                src={facility.imageUrl} 
-                alt={facility.name} 
-                className="w-full h-full object-cover"
-              />
-            </div>
+            {facility.image_url && (
+              <div className="h-40 overflow-hidden">
+                <img
+                  src={facility.image_url}
+                  alt={facility.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            {!facility.image_url && (
+              <div className="h-40 bg-gradient-to-br from-green-50 to-green-100 flex items-center justify-center">
+                <span className="text-green-600 text-lg font-semibold">{facility.name.charAt(0)}</span>
+              </div>
+            )}
             <div className="p-4">
               <h3 className="font-semibold text-green-800 text-lg">{facility.name}</h3>
-              <p className="text-gray-600 mb-3">{facility.location}</p>
-              
+              <p className="text-gray-600 mb-3">{facility.lga}, {facility.ward}</p>
+
               <div className="mb-3">
                 <h4 className="text-sm font-medium text-gray-700 mb-2">Services:</h4>
                 <div className="flex flex-wrap gap-2">
-                  {facility.services.map((service, idx) => (
-                    <span 
-                      key={idx} 
+                  {facility.services.slice(0, 4).map((service, idx) => (
+                    <span
+                      key={idx}
                       className="px-2 py-1 bg-green-50 text-green-700 text-xs rounded-full"
                     >
                       {service}
                     </span>
                   ))}
+                  {facility.services.length > 4 && (
+                    <span className="px-2 py-1 bg-gray-50 text-gray-700 text-xs rounded-full">
+                      +{facility.services.length - 4} more
+                    </span>
+                  )}
                 </div>
               </div>
-              
+
               <div className="flex justify-between items-center text-sm text-gray-500">
-                <span>Staff: {facility.staffCount}</span>
-                <button className="text-green-600 hover:text-green-800 font-medium transition-colors">
-                  View Details
-                </button>
+                <span>Staff: {facility.staff_count}</span>
               </div>
             </div>
           </div>

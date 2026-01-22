@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
-import { getAllPHCs, createPHC, updatePHC, deletePHC } from '../../lib/supabase';
+import { getAllPHCs, createPHC, updatePHC, deletePHC, uploadPHCImage, deletePHCImage } from '../../lib/supabase';
 import { PHC, KWARA_LGAS } from '../../types';
-import { Plus, Edit, Trash2, Search, Building2 } from 'lucide-react';
+import { Plus, Edit, Trash2, Search, Building2, Upload, X } from 'lucide-react';
 import toast from 'react-hot-toast';
 
 const PHCManagement: React.FC = () => {
@@ -10,6 +10,9 @@ const PHCManagement: React.FC = () => {
   const [searchTerm, setSearchTerm] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [editingPHC, setEditingPHC] = useState<PHC | null>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [imagePreview, setImagePreview] = useState<string | null>(null);
+  const [uploadingImage, setUploadingImage] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     lga: '',
@@ -20,6 +23,7 @@ const PHCManagement: React.FC = () => {
     services: [] as string[],
     staff_count: 0,
     status: 'active' as 'active' | 'inactive',
+    image_url: '',
   });
 
   const availableServices = [
@@ -52,26 +56,66 @@ const PHCManagement: React.FC = () => {
     }
   };
 
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toast.error('Image size should be less than 5MB');
+        return;
+      }
+
+      setImageFile(file);
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        setImagePreview(reader.result as string);
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
+  const handleRemoveImage = () => {
+    setImageFile(null);
+    setImagePreview(null);
+    setFormData(prev => ({ ...prev, image_url: '' }));
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     try {
+      let imageUrl = formData.image_url;
+
+      if (imageFile) {
+        setUploadingImage(true);
+        const { data: imageData, error: imageError } = await uploadPHCImage(imageFile);
+        setUploadingImage(false);
+
+        if (imageError) {
+          toast.error('Failed to upload image');
+          return;
+        }
+
+        imageUrl = imageData?.url || '';
+      }
+
+      const phcData = { ...formData, image_url: imageUrl };
+
       if (editingPHC) {
-        const { error } = await updatePHC(editingPHC.id, formData);
+        const { error } = await updatePHC(editingPHC.id, phcData);
         if (error) throw error;
-        
-        setPHCs(phcs.map(phc => 
-          phc.id === editingPHC.id ? { ...phc, ...formData } : phc
+
+        setPHCs(phcs.map(phc =>
+          phc.id === editingPHC.id ? { ...phc, ...phcData } : phc
         ));
         toast.success('PHC updated successfully');
       } else {
-        const { data, error } = await createPHC(formData);
+        const { data, error } = await createPHC(phcData);
         if (error) throw error;
-        
+
         setPHCs([data, ...phcs]);
         toast.success('PHC created successfully');
       }
-      
+
       resetForm();
     } catch (error) {
       console.error('Error saving PHC:', error);
@@ -91,7 +135,10 @@ const PHCManagement: React.FC = () => {
       services: phc.services,
       staff_count: phc.staff_count,
       status: phc.status,
+      image_url: phc.image_url || '',
     });
+    setImagePreview(phc.image_url || null);
+    setImageFile(null);
     setShowModal(true);
   };
 
@@ -121,8 +168,11 @@ const PHCManagement: React.FC = () => {
       services: [],
       staff_count: 0,
       status: 'active',
+      image_url: '',
     });
     setEditingPHC(null);
+    setImageFile(null);
+    setImagePreview(null);
     setShowModal(false);
   };
 
@@ -176,67 +226,78 @@ const PHCManagement: React.FC = () => {
       {/* PHCs Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredPHCs.map((phc) => (
-          <div key={phc.id} className="bg-white rounded-lg shadow-sm border border-gray-200 p-6">
-            <div className="flex items-start justify-between mb-4">
-              <div className="flex items-center">
-                <Building2 className="h-8 w-8 text-green-600 mr-3" />
-                <div>
-                  <h3 className="text-lg font-semibold text-gray-900">{phc.name}</h3>
-                  <p className="text-sm text-gray-500">{phc.lga}, {phc.ward}</p>
+          <div key={phc.id} className="bg-white rounded-lg shadow-sm border border-gray-200 overflow-hidden">
+            {phc.image_url && (
+              <div className="h-40 overflow-hidden">
+                <img
+                  src={phc.image_url}
+                  alt={phc.name}
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            )}
+            <div className="p-6">
+              <div className="flex items-start justify-between mb-4">
+                <div className="flex items-center">
+                  {!phc.image_url && <Building2 className="h-8 w-8 text-green-600 mr-3" />}
+                  <div>
+                    <h3 className="text-lg font-semibold text-gray-900">{phc.name}</h3>
+                    <p className="text-sm text-gray-500">{phc.lga}, {phc.ward}</p>
+                  </div>
+                </div>
+                <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                  phc.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+                }`}>
+                  {phc.status}
+                </span>
+              </div>
+
+              <div className="space-y-2 mb-4">
+                <p className="text-sm text-gray-600">{phc.address}</p>
+                {phc.phone && (
+                  <p className="text-sm text-gray-600">📞 {phc.phone}</p>
+                )}
+                {phc.email && (
+                  <p className="text-sm text-gray-600">✉️ {phc.email}</p>
+                )}
+                <p className="text-sm text-gray-600">👥 {phc.staff_count} staff members</p>
+              </div>
+
+              <div className="mb-4">
+                <h4 className="text-sm font-medium text-gray-700 mb-2">Services:</h4>
+                <div className="flex flex-wrap gap-1">
+                  {phc.services.slice(0, 3).map((service) => (
+                    <span
+                      key={service}
+                      className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700"
+                    >
+                      {service}
+                    </span>
+                  ))}
+                  {phc.services.length > 3 && (
+                    <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700">
+                      +{phc.services.length - 3} more
+                    </span>
+                  )}
                 </div>
               </div>
-              <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
-                phc.status === 'active' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-              }`}>
-                {phc.status}
-              </span>
-            </div>
-            
-            <div className="space-y-2 mb-4">
-              <p className="text-sm text-gray-600">{phc.address}</p>
-              {phc.phone && (
-                <p className="text-sm text-gray-600">📞 {phc.phone}</p>
-              )}
-              {phc.email && (
-                <p className="text-sm text-gray-600">✉️ {phc.email}</p>
-              )}
-              <p className="text-sm text-gray-600">👥 {phc.staff_count} staff members</p>
-            </div>
-            
-            <div className="mb-4">
-              <h4 className="text-sm font-medium text-gray-700 mb-2">Services:</h4>
-              <div className="flex flex-wrap gap-1">
-                {phc.services.slice(0, 3).map((service) => (
-                  <span
-                    key={service}
-                    className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-green-50 text-green-700"
-                  >
-                    {service}
-                  </span>
-                ))}
-                {phc.services.length > 3 && (
-                  <span className="inline-flex items-center px-2 py-1 rounded-full text-xs font-medium bg-gray-50 text-gray-700">
-                    +{phc.services.length - 3} more
-                  </span>
-                )}
+
+              <div className="flex space-x-2">
+                <button
+                  onClick={() => handleEdit(phc)}
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                >
+                  <Edit className="h-4 w-4 mr-1" />
+                  Edit
+                </button>
+                <button
+                  onClick={() => handleDelete(phc.id)}
+                  className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
+                >
+                  <Trash2 className="h-4 w-4 mr-1" />
+                  Delete
+                </button>
               </div>
-            </div>
-            
-            <div className="flex space-x-2">
-              <button
-                onClick={() => handleEdit(phc)}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
-              >
-                <Edit className="h-4 w-4 mr-1" />
-                Edit
-              </button>
-              <button
-                onClick={() => handleDelete(phc.id)}
-                className="flex-1 inline-flex items-center justify-center px-3 py-2 border border-red-300 text-sm font-medium rounded-md text-red-700 bg-white hover:bg-red-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500"
-              >
-                <Trash2 className="h-4 w-4 mr-1" />
-                Delete
-              </button>
             </div>
           </div>
         ))}
@@ -263,6 +324,45 @@ const PHCManagement: React.FC = () => {
             </div>
             
             <form onSubmit={handleSubmit} className="p-6 space-y-4">
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-2">
+                  PHC Image
+                </label>
+                <div className="flex items-start gap-4">
+                  {imagePreview ? (
+                    <div className="relative">
+                      <img
+                        src={imagePreview}
+                        alt="Preview"
+                        className="w-32 h-32 object-cover rounded-lg border border-gray-300"
+                      />
+                      <button
+                        type="button"
+                        onClick={handleRemoveImage}
+                        className="absolute -top-2 -right-2 bg-red-500 text-white rounded-full p-1 hover:bg-red-600"
+                      >
+                        <X className="h-4 w-4" />
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-32 h-32 border-2 border-dashed border-gray-300 rounded-lg flex items-center justify-center">
+                      <Upload className="h-8 w-8 text-gray-400" />
+                    </div>
+                  )}
+                  <div className="flex-1">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={handleImageChange}
+                      className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-md file:border-0 file:text-sm file:font-semibold file:bg-green-50 file:text-green-700 hover:file:bg-green-100"
+                    />
+                    <p className="mt-1 text-xs text-gray-500">
+                      PNG, JPG, GIF up to 5MB
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-sm font-medium text-gray-700 mb-1">
@@ -396,15 +496,24 @@ const PHCManagement: React.FC = () => {
                 <button
                   type="button"
                   onClick={resetForm}
-                  className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  disabled={uploadingImage}
+                  className="px-4 py-2 border border-gray-300 text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500"
+                  disabled={uploadingImage}
+                  className="px-4 py-2 border border-transparent text-sm font-medium rounded-md text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 flex items-center"
                 >
-                  {editingPHC ? 'Update PHC' : 'Create PHC'}
+                  {uploadingImage ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Uploading...
+                    </>
+                  ) : (
+                    editingPHC ? 'Update PHC' : 'Create PHC'
+                  )}
                 </button>
               </div>
             </form>
