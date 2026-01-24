@@ -1,12 +1,12 @@
 import React from 'react';
 
-const Logo = () => {
+const Log = () => {
   return (
     <div className="flex items-center">
       <img
-        src="http://kwphcda.com.ng/images/logo.png"
-        alt="KWSPHCDA Logo"
-        className="h-16 w-16 rounded-s-lg mr-2"
+        src="http://kwphcda.com.ng/images/icon.png"
+        alt="KWSPHCDA Log"
+        className="h-16 w-16 rounded-md mr-2"
       />
       {/* <div className="bg-green-600 p-2 rounded-full text-white mr-2">
         <Activity size={24} />
@@ -21,4 +21,4 @@ const Logo = () => {
   );
 };
 
-export default Logo;
+export default Log;

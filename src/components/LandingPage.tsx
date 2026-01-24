@@ -6,6 +6,7 @@ import { useAuth } from '../context/AuthContext';
 import { ModalProvider } from '../context/ModalContext';
 import BlogSection from './BlogSection';
 import ExecutiveSection from './ExecutiveSection';
+import FeaturesSection from './FeaturesSection';
 import Footer from './Footer';
 import Hero from './Hero';
 import ModalContainer from './ModalContainer';
@@ -26,7 +27,9 @@ const LandingPage: React.FC = () => {
      
 
           <Hero />
+                    <FeaturesSection />
           <ExecutiveSection />
+
           <BlogSection />
         </main>
         <Footer />

@@ -1,5 +1,5 @@
 import React from 'react';
-import Logo from './Logo';
+import Log from './Logo2';
 import { MapPin, Phone, Mail, Clock, Facebook, Twitter, Instagram } from 'lucide-react';
 
 const Footer = () => {
@@ -9,7 +9,7 @@ const Footer = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8">
           <div>
             <div className="mb-4">
-              <Logo />
+              <Log />
             </div>
             <p className="text-green-100 mb-6">
               Committed to providing quality primary healthcare services to all residents of Kwara State.

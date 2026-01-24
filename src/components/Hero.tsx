@@ -69,7 +69,10 @@ const Hero = () => {
   }, []);
 
   return (
-    <section className="relative h-screen overflow-hidden mt-3">
+   <div className="mt-10">
+    {/* <div className="text-center "> <p style={{fontSize: "10px", fontFamily: "Poppins, sans-serif"}}>The official website of the Kwara State Primary Health Care Development Agency (KWSPHCDA)</p></div>
+     */} 
+     <section className="relative h-screen overflow-hidden rounded-t-lg shadow-lg">
       {/* Slides */}
       {slides.map((slide, index) => (
         <div
@@ -85,7 +88,7 @@ const Hero = () => {
           <img
             src={slide.imageUrl}
             alt={slide.title}
-            className="w-full h-full object-center"
+            className="w-full h-full object-cover"
           />
           <div className="absolute inset-0 z-20 flex items-center justify-center">
             <div className="text-center text-white max-w-3xl px-4">
@@ -112,6 +115,8 @@ const Hero = () => {
         ))}
       </div>
     </section>
+   </div>
+  
   );
 };
 
