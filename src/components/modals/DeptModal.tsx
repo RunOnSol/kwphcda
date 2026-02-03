@@ -15,13 +15,13 @@ const departments = [
   },
   {
     id: 2,
-    name: 'Disease Control and Immunization',
+    name: ' Immunization',
     description: 'Responsible for the prevention, control, and management of communicable and non-communicable diseases through vaccination and other preventive measures.',
     functions: [
       'Planning and implementation of immunization campaigns',
       'Disease surveillance and outbreak response',
       'Cold chain management for vaccines',
-      'Training on disease prevention and control',
+      'Health education on disease prevention',
     ],
     icon: '💉',
   },

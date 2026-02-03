@@ -40,7 +40,7 @@ const services = [
   },
   {
     id: 4,
-    name: 'Disease Control and Surveillance',
+    name: 'Surveillance',
     description: 'Activities aimed at preventing and controlling communicable and non-communicable diseases through surveillance and response.',
     details: [
       'Disease surveillance and outbreak investigation',

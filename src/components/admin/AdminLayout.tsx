@@ -70,7 +70,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
     },
     {
       id: "blog",
-      label: "Blog Management",
+      label: "Events & Activities",
       icon: FileText,
       show: canAccessBlog,
     },
@@ -199,7 +199,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                   : activeTab === "attendance"
                   ? "Attendance Management"
                   : activeTab === "blog"
-                  ? "Blog Management"
+                  ? "Events & Activities"
                   : activeTab === "activity_logs"
                   ? "Activity Logs"
                   : activeTab === "analytics"

@@ -70,8 +70,8 @@ const Hero = () => {
 
   return (
    <div className="mt-10">
-    {/* <div className="text-center "> <p style={{fontSize: "10px", fontFamily: "Poppins, sans-serif"}}>The official website of the Kwara State Primary Health Care Development Agency (KWSPHCDA)</p></div>
-     */} 
+   <div className="text-center text-green-800 mb-3 "> <marquee style={{fontSize: "15px", textAlign: "center", fontFamily: "Poppins, sans-serif", fontWeight: "bold"}}><span>The official website of the Kwara State Primary Health Care Development Agency (KWSPHCDA)</span><br /><span><a href="tel://+2348031234567" target="_blank" rel="noopener noreferrer">Toll Free: 0803 123 4567</a></span></marquee></div>
+     
      <section className="relative h-screen overflow-hidden rounded-t-lg shadow-lg">
       {/* Slides */}
       {slides.map((slide, index) => (

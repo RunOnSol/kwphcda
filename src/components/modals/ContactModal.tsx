@@ -69,7 +69,7 @@ const ContactModal = () => {
               <Mail size={20} className="text-green-600 mr-3 mt-1 flex-shrink-0" />
               <div>
                 <h4 className="font-medium text-gray-800">Email</h4>
-                <p className="text-gray-600">info@kwsphcda.gov.ng, contact@kwsphcda.gov.ng</p>
+                <p className="text-gray-600">info@sphcda.kw.gov.ng, contact@sphcda.kw.gov.ng</p>
               </div>
             </div>
             
