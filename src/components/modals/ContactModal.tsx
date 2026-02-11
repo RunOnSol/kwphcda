@@ -60,8 +60,8 @@ const ContactModal = () => {
             <div className="flex items-start">
               <Phone size={20} className="text-green-600 mr-3 mt-1 flex-shrink-0" />
               <div>
-                <h4 className="font-medium text-gray-800">Phone</h4>
-                <p className="text-gray-600">+234 803 123 4567, +234 905 678 9012</p>
+                <h4 className="font-medium text-gray-800">Toll free line</h4>
+                <p className="text-gray-600">+234 816 009 6735</p>
               </div>
             </div>
             

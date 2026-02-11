@@ -7,21 +7,21 @@ const slides = [
     title: "Immunization Saves Lives",
     description:
       "Protecting our children through comprehensive vaccination programs across Kwara State.",
-    imageUrl: "http://kwphcda.com.ng/image/2.jpg",
+    imageUrl: "https://sphcda.kw.gov.ng/image/hero1.jpg",
   },
   {
     id: 2,
     title: "Vaccine Awareness",
     description:
       "Educating communities about the importance of vaccines in preventing diseases.",
-    imageUrl: "http://kwphcda.com.ng/image/1.jpg",
+    imageUrl: "https://sphcda.kw.gov.ng/image/hero2.jpg",
   },
   {
     id: 3,
     title: "Maternal Health Services",
     description:
       "Ensuring the health and wellbeing of mothers across all communities in Kwara State.",
-    imageUrl: "http://kwphcda.com.ng/image/post1.jpg",
+    imageUrl: "https://sphcda.kw.gov.ng/image/hero3.jpg",
   },
   {
     id: 4,
@@ -29,7 +29,7 @@ const slides = [
     description:
       "Comprehensive healthcare solutions for children from birth through adolescence.",
     imageUrl:
-      "http://kwphcda.com.ng/image/2.jpg",
+      "https://sphcda.kw.gov.ng/image/hero4.jpg",
   },
   {
     id: 5,
@@ -37,7 +37,7 @@ const slides = [
     description:
       "Our dedicated professionals bringing healthcare to every doorstep.",
     imageUrl:
-      "http://kwphcda.com.ng/image/1.jpg",
+      "https://sphcda.kw.gov.ng/image/hero5.jpg",
   },
   {
     id: 6,
@@ -45,7 +45,7 @@ const slides = [
     description:
       "Proactive measures to prevent communicable and non-communicable diseases.",
     imageUrl:
-      "http://kwphcda.com.ng/image/post1.jpg",
+      "https://sphcda.kw.gov.ng/image/hero6.jpg",
   },
   {
     id: 7,
@@ -70,7 +70,7 @@ const Hero = () => {
 
   return (
    <div className="mt-10">
-   <div className="text-center text-green-800 mb-3 "> <marquee style={{fontSize: "15px", textAlign: "center", fontFamily: "Poppins, sans-serif", fontWeight: "bold"}}><span>The official website of the Kwara State Primary Health Care Development Agency (KWSPHCDA)</span><br /><span><a href="tel://+2348031234567" target="_blank" rel="noopener noreferrer">Toll Free: 0803 123 4567</a></span></marquee></div>
+   <div className="text-center text-green-800 mb-3 "> <marquee style={{fontSize: "15px", textAlign: "center", fontFamily: "Poppins, sans-serif", fontWeight: "bold"}}><span>The official website of the Kwara State Primary Health Care Development Agency (KWSPHCDA)</span><br /><span><a href="tel://+2348160096735" target="_blank" rel="noopener noreferrer">Toll free line: 0816 009 6735</a></span></marquee></div>
      
      <section className="relative h-screen overflow-hidden rounded-t-lg shadow-lg">
       {/* Slides */}
