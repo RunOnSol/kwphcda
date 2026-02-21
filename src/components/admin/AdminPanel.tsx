@@ -9,6 +9,7 @@ import Analytics from "./Analytics";
 import AttendanceManagement from "./AttendanceManagement";
 import BlogManagement from "./BlogManagement";
 import Dashboard from "./Dashboard";
+import GalleryManagement from "./GalleryManagement";
 import PHCManagement from "./PHCManagement";
 import Settings from "./Settings";
 import StaffManagement from "./StaffManagement";
@@ -82,6 +83,8 @@ const AdminPanel: React.FC = () => {
         return <AttendanceManagement />;
       case "blog":
         return <BlogManagement />;
+      case "gallery":
+        return <GalleryManagement />;
       case "activity_logs":
         return <ActivityLogs />;
       case "analytics":

@@ -15,6 +15,7 @@ import toast from "react-hot-toast";
 
 import { useAuth } from "../../context/AuthContext";
 import { logActivity } from "../../lib/activityLogger";
+import { isValidYouTubeUrl } from "../../lib/youtube";
 import {
   createBlogPost,
   deleteBlogImage,
@@ -39,6 +40,7 @@ const BlogManagement: React.FC = () => {
     content: "",
     category: "",
     image_url: "",
+    youtube_url: "",
     status: "draft" as "draft" | "published" | "archived",
   });
   const [imageFile, setImageFile] = useState<File | null>(null);
@@ -118,6 +120,13 @@ const BlogManagement: React.FC = () => {
 
     try {
       setUploading(true);
+      const normalizedYoutubeUrl = formData.youtube_url.trim();
+      if (normalizedYoutubeUrl && !isValidYouTubeUrl(normalizedYoutubeUrl)) {
+        toast.error("Please enter a valid YouTube link");
+        setUploading(false);
+        return;
+      }
+
       let imageUrl = formData.image_url;
 
       if (imageFile) {
@@ -138,6 +147,7 @@ const BlogManagement: React.FC = () => {
 
       const postData = {
         ...formData,
+        youtube_url: normalizedYoutubeUrl || null,
         image_url: imageUrl,
         author_id: user?.id,
       };
@@ -199,6 +209,7 @@ const BlogManagement: React.FC = () => {
       content: post.content,
       category: post.category,
       image_url: post.image_url || "",
+      youtube_url: post.youtube_url || "",
       status: post.status,
     });
     if (post.image_url) {
@@ -245,6 +256,7 @@ const BlogManagement: React.FC = () => {
       content: "",
       category: "",
       image_url: "",
+      youtube_url: "",
       status: "draft",
     });
     setImageFile(null);
@@ -555,6 +567,27 @@ const BlogManagement: React.FC = () => {
                   className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
                   placeholder="Write your post content here..."
                 />
+              </div>
+
+              <div>
+                <label className="block text-sm font-medium text-gray-700 mb-1">
+                  YouTube Video Link (Optional)
+                </label>
+                <input
+                  type="url"
+                  value={formData.youtube_url}
+                  onChange={(e) =>
+                    setFormData((prev) => ({
+                      ...prev,
+                      youtube_url: e.target.value,
+                    }))
+                  }
+                  placeholder="https://www.youtube.com/watch?v=..."
+                  className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-green-500 focus:border-green-500"
+                />
+                <p className="mt-1 text-xs text-gray-500">
+                  Accepted formats: youtube.com/watch, youtu.be, and youtube.com/shorts links.
+                </p>
               </div>
 
               <div className="flex justify-end space-x-3 pt-4">

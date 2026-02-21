@@ -7,6 +7,7 @@ import {
   Clock,
   FileText,
   Home,
+  Images,
   LogOut,
   Menu,
   Settings,
@@ -35,6 +36,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
   const canAccessPHCs = user?.role === "super_admin" || user?.role === "admin";
   const canAccessStaff = user?.role === "super_admin" || user?.role === "admin";
   const canAccessBlog = ["super_admin", "admin", "manager", "blogger"].includes(
+    user?.role || ""
+  );
+  const canAccessGallery = ["super_admin", "admin", "manager", "blogger"].includes(
     user?.role || ""
   );
   const canAccessActivityLogs = user?.role === "super_admin" || user?.role === "admin";
@@ -73,6 +77,12 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
       label: "Events & Activities",
       icon: FileText,
       show: canAccessBlog,
+    },
+    {
+      id: "gallery",
+      label: "Gallery",
+      icon: Images,
+      show: canAccessGallery,
     },
     {
       id: "activity_logs",
@@ -200,6 +210,8 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({
                   ? "Attendance Management"
                   : activeTab === "blog"
                   ? "Events & Activities"
+                  : activeTab === "gallery"
+                  ? "Gallery"
                   : activeTab === "activity_logs"
                   ? "Activity Logs"
                   : activeTab === "analytics"

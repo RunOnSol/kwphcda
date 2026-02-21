@@ -43,11 +43,25 @@ export interface BlogPost {
   content: string;
   category: string;
   image_url?: string;
+  youtube_url?: string | null;
   author_id: string;
   status: "draft" | "published" | "archived";
   created_at: string;
   updated_at: string;
   author?: User;
+}
+
+export interface GalleryImage {
+  id: string;
+  title: string;
+  description?: string | null;
+  image_url: string;
+  image_path: string;
+  author_id: string;
+  status: "active" | "archived";
+  created_at: string;
+  updated_at: string;
+  author?: Pick<User, "full_name" | "username">;
 }
 
 export interface AuthState {

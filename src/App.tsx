@@ -10,6 +10,7 @@ import SigninPage from "./components/auth/SigninPage";
 import SignupPage from "./components/auth/SignupPage";
 import BlogPost from "./components/blog/BlogPost";
 import Dashboard from "./components/Dashboard";
+import GalleryPage from "./components/GalleryPage";
 import LandingPage from "./components/LandingPage";
 import ProtectedRoute from "./components/ProtectedRoute";
 import EmailGeneration from "./components/staff/EmailGeneration";
@@ -27,6 +28,7 @@ const AppContent: React.FC = () => {
     <Routes>
       {/* Public routes */}
       <Route path="/" element={<LandingPage />} />
+      <Route path="/gallery" element={<GalleryPage />} />
       <Route path="/signin" element={<SigninPage />} />
       <Route path="/signup" element={<SignupPage />} />
       <Route path="/blog/:id" element={<BlogPost />} />

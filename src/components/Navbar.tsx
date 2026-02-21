@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { Menu, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
-import { useAuth } from "../context/AuthContext";
 import { useModal } from "../context/ModalContext";
 import Logo from "./Logo";
 
@@ -24,7 +23,6 @@ const Navbar = () => {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const { openModal } = useModal();
-  const { user } = useAuth();
   const navigate = useNavigate();
 
   useEffect(() => {
@@ -42,11 +40,6 @@ const Navbar = () => {
   const handleNavItemClick = (id: (typeof navItems)[number]["id"]) => {
     openModal(id);
     setIsMenuOpen(false);
-  };
-
-  const handleAuthClick = () => {
-    if (user) navigate("/dashboard");
-    else navigate("/signin");
   };
 
   return (
@@ -79,6 +72,12 @@ const Navbar = () => {
                   {item.label}
                 </button>
               ))}
+              <button
+                onClick={() => navigate("/gallery")}
+                className="text-green-800 hover:text-green-600 font-medium transition-colors whitespace-nowrap px-2 py-1"
+              >
+                Gallery
+              </button>
 
              {/* <button
                 onClick={() => navigate("/staff/email")}
@@ -130,6 +129,15 @@ const Navbar = () => {
                 {item.label}
               </button>
             ))}
+            <button
+              onClick={() => {
+                navigate("/gallery");
+                setIsMenuOpen(false);
+              }}
+              className="text-green-800 hover:text-green-600 py-2 px-4 text-left font-medium border-b border-green-100 transition-colors"
+            >
+              Gallery
+            </button>
 
             {/* <button
               onClick={() => {

@@ -178,6 +178,50 @@ export const deleteBlogPost = async (id: string) => {
   return { error };
 };
 
+export const getAllGalleryImages = async () => {
+  const { data, error } = await supabase
+    .from("gallery_images")
+    .select(
+      `
+      *,
+      author:users(full_name, username)
+    `
+    )
+    .order("created_at", { ascending: false });
+
+  return { data, error };
+};
+
+export const getPublicGalleryImages = async (limit?: number) => {
+  let query = supabase
+    .from("gallery_images")
+    .select("*")
+    .eq("status", "active")
+    .order("created_at", { ascending: false });
+
+  if (typeof limit === "number") {
+    query = query.limit(limit);
+  }
+
+  const { data, error } = await query;
+  return { data, error };
+};
+
+export const createGalleryImage = async (payload: any) => {
+  const { data, error } = await supabase
+    .from("gallery_images")
+    .insert(payload)
+    .select()
+    .single();
+
+  return { data, error };
+};
+
+export const deleteGalleryImageRecord = async (id: string) => {
+  const { error } = await supabase.from("gallery_images").delete().eq("id", id);
+  return { error };
+};
+
 // Staff management functions
 export const getAllStaff = async () => {
   const { data, error } = await supabase
@@ -286,6 +330,39 @@ export const uploadPHCImage = async (file: File) => {
 export const deletePHCImage = async (imagePath: string) => {
   const { error } = await supabase.storage
     .from("phc-images")
+    .remove([imagePath]);
+
+  return { error };
+};
+
+export const uploadGalleryImage = async (file: File) => {
+  const fileExt = file.name.split(".").pop();
+  const fileName = `${Date.now()}-${Math.random()
+    .toString(36)
+    .substring(7)}.${fileExt}`;
+  const filePath = `${fileName}`;
+
+  const { data, error } = await supabase.storage
+    .from("gallery-images")
+    .upload(filePath, file, {
+      cacheControl: "3600",
+      upsert: false,
+    });
+
+  if (error) {
+    return { data: null, error };
+  }
+
+  const {
+    data: { publicUrl },
+  } = supabase.storage.from("gallery-images").getPublicUrl(filePath);
+
+  return { data: { ...data, path: filePath, url: publicUrl }, error: null };
+};
+
+export const deleteGalleryImageFile = async (imagePath: string) => {
+  const { error } = await supabase.storage
+    .from("gallery-images")
     .remove([imagePath]);
 
   return { error };

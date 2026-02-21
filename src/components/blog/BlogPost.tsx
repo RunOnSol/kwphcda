@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
 import { getBlogPost } from '../../lib/supabase';
+import { getYouTubeEmbedUrl } from '../../lib/youtube';
 import { BlogPost as BlogPostType } from '../../types';
 import { ArrowLeft, Calendar, User, Tag } from 'lucide-react';
 import { format } from 'date-fns';
@@ -62,6 +63,8 @@ const BlogPost: React.FC = () => {
       </div>
     );
   }
+
+  const youtubeEmbedUrl = getYouTubeEmbedUrl(post.youtube_url);
 
   return (
     <div className="min-h-screen bg-gray-50">
@@ -134,6 +137,22 @@ const BlogPost: React.FC = () => {
                 </p>
               ))}
             </div>
+
+            {youtubeEmbedUrl && (
+              <div className="mt-10">
+                <h2 className="text-xl font-semibold text-gray-900 mb-4">Video</h2>
+                <div className="relative w-full overflow-hidden rounded-lg" style={{ paddingTop: '56.25%' }}>
+                  <iframe
+                    src={youtubeEmbedUrl}
+                    title={`${post.title} video`}
+                    className="absolute top-0 left-0 w-full h-full"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                    referrerPolicy="strict-origin-when-cross-origin"
+                    allowFullScreen
+                  />
+                </div>
+              </div>
+            )}
 
             {/* Footer */}
             <div className="mt-12 pt-8 border-t border-gray-200">
