@@ -1,20 +1,3 @@
-/*
-  # Add Gallery Management and YouTube Embed Support
-
-  1. Updates
-    - Add `youtube_url` column to `blog_posts`
-    - Create `gallery_images` table for website gallery records
-    - Add public read policy for published blog posts
-
-  2. Storage
-    - Create `gallery-images` storage bucket
-    - Add storage policies for public read and content-manager writes
-
-  3. Security
-    - Enable RLS for gallery table
-    - Allow only approved super_admin/admin/manager/blogger users to manage gallery images
-*/
-
 ALTER TABLE blog_posts
 ADD COLUMN IF NOT EXISTS youtube_url text;
 
